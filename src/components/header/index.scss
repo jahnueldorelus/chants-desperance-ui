@@ -11,28 +11,28 @@ $navLinkBorderRadius: 0.4rem;
   /**
   * DESKTOP NAVIGATION STYLES
   */
-  .nav-item {
+  .app-nav-item {
     $navLinkHoverColor: var(--bs-tertiary);
 
     // Navigation links
-    a {
+    .app-nav-link {
       @include navLink;
 
-      .nav-link {
-        padding: 0.25rem 0.5rem;
-        @include navLink;
+      padding: 0.1rem 0.45rem;
+      @include navLink;
 
-        &:hover {
-          color: $navLinkHoverColor;
-        }
+      &:hover {
+        color: var(--bs-secondary);
       }
 
       &.active {
-        background-color: var(--bs-senary);
-        color: $navLinkColor;
+        $newNavLinkColor: var(--bs-tertiary);
+
+        background-color: $navLinkColor;
+        color: $newNavLinkColor;
 
         *:hover {
-          color: $navLinkColor;
+          color: $newNavLinkColor;
         }
       }
     }
@@ -42,21 +42,35 @@ $navLinkBorderRadius: 0.4rem;
 /**
  * MOBILE NAVIGATION OFFCANVAS STYLES
  */
+.app-nav-toggle {
+  height: 2.2rem;
+}
+
 .offcanvas {
   max-width: 15rem !important;
 
-  .nav-item {
-    // Navigation links
-    a {
-      padding: 0.25rem 0.75rem;
+  .close-menu-btn {
+    background-color: transparent;
+    padding: 0.4rem 0.75rem;
+
+    &:hover {
+      background-color: var(--bs-secondary);
+    }
+  }
+
+  .app-nav-item {
+    .app-nav-link {
+      padding: 0.3rem 0.75rem;
+      width: 100%;
       @include navLink;
       color: var(--bs-primary);
 
       &:hover {
-        color: var(--bs-quaternary);
+        color: var(--bs-tertiary);
+        background-color: var(--bs-secondary);
       }
       &.active {
-        background-color: var(--bs-senary);
+        background-color: var(--bs-primary);
         color: $navLinkColor;
       }
     }

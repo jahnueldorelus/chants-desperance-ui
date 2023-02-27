@@ -1,11 +1,6 @@
 // Sets default styles of a button
 button {
-  transition: transform 0.1s ease-in !important;
-
-  // Makes the button smaller when the user clicks it
-  &:active {
-    transform: scale(0.95);
-  }
+  border: none;
 
   // Darkens the color of the button and removes animations when it's disabled
   &[aria-disabled="true"] {
@@ -68,6 +63,11 @@ img {
   width: -webkit-fit-content !important;
   width: -moz-fit-content !important;
   width: fit-content !important;
+}
+
+// Sets width of an element to it's full potential size
+.w-full {
+  width: 100%;
 }
 
 // 1. BOOTSTRAP VARIABLE OVERIDES

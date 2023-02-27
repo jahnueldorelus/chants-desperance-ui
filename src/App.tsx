@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { AppFooter } from "@components/footer";
 import { appContentHeightService } from "@services/app-content-height";
+import { parentWindowService } from "@services/parent-window";
 import "./App.scss";
 
 function App() {
@@ -27,9 +28,9 @@ function App() {
   }, [headerRef.current, footerRef.current]);
 
   /**
-   * Both useEffects sets the minimum height of the main content on page load and
+   * Both useEffects below sets the minimum height of the main content on page load and
    * on location change. This makes the content on the page to have the full height
-   * of the window.
+   * of the window. It also removes unneeded event listeners.
    */
   useEffect(() => {
     appContentHeightService.calculateNewHeight();
@@ -59,6 +60,8 @@ function App() {
       } else {
         window.removeEventListener("resize", resizeListenerFunction);
       }
+
+      parentWindowService.destroyListener();
     };
   }, []);
 

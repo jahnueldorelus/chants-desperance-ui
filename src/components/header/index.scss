@@ -1,0 +1,64 @@
+$navLinkColor: white;
+$navLinkBorderRadius: 0.4rem;
+
+@mixin navLink {
+  color: $navLinkColor;
+  border-radius: $navLinkBorderRadius;
+  text-decoration: none;
+}
+
+.app-navbar {
+  /**
+  * DESKTOP NAVIGATION STYLES
+  */
+  .nav-item {
+    $navLinkHoverColor: var(--bs-tertiary);
+
+    // Navigation links
+    a {
+      @include navLink;
+
+      .nav-link {
+        padding: 0.25rem 0.5rem;
+        @include navLink;
+
+        &:hover {
+          color: $navLinkHoverColor;
+        }
+      }
+
+      &.active {
+        background-color: var(--bs-senary);
+        color: $navLinkColor;
+
+        *:hover {
+          color: $navLinkColor;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * MOBILE NAVIGATION OFFCANVAS STYLES
+ */
+.offcanvas {
+  max-width: 15rem !important;
+
+  .nav-item {
+    // Navigation links
+    a {
+      padding: 0.25rem 0.75rem;
+      @include navLink;
+      color: var(--bs-primary);
+
+      &:hover {
+        color: var(--bs-quaternary);
+      }
+      &.active {
+        background-color: var(--bs-senary);
+        color: $navLinkColor;
+      }
+    }
+  }
+}

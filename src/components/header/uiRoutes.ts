@@ -1,5 +1,6 @@
 const uiRoutes = {
-  home: "/",
+  songs: "/",
+  favorites: "/favorites",
 };
 
 export { uiRoutes };

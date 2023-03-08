@@ -4,6 +4,7 @@ import App from "./App";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ErrorPage } from "@views/error";
 import { uiRoutes } from "@components/header/uiRoutes";
+import { Songs } from "@views/songs";
 
 const router = createBrowserRouter([
   {
@@ -13,7 +14,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: uiRoutes.songs,
-        element: <></>,
+        element: <Songs />,
       },
       {
         path: uiRoutes.favorites,

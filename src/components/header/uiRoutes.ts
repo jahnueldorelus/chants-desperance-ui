@@ -1,6 +1,4 @@
-const uiRoutes = {
+export const uiRoutes = {
   songs: "/",
   favorites: "/favorites",
 };
-
-export { uiRoutes };

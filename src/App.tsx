@@ -3,7 +3,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { AppFooter } from "@components/footer";
 import { appContentHeightService } from "@services/app-content-height";
-import { parentWindowService } from "@services/parent-window";
 import "./App.scss";
 
 function App() {
@@ -60,8 +59,6 @@ function App() {
       } else {
         window.removeEventListener("resize", resizeListenerFunction);
       }
-
-      parentWindowService.destroyListener();
     };
   }, []);
 

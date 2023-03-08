@@ -1,26 +1,53 @@
-import {
-  ApiRequest,
-  ApiRequestPayload,
-  ApiResponse,
-} from "@app-types/services/api";
-import { parentWindowService } from "@services/parent-window";
+import { APIRoute, APIRequestConfig } from "@app-types/services/api";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
-class ApiService {
-  handleRequestResponse(response: ApiResponse) {
-    // SEND MESSAGE TO API CONTEXT [type ApiResponse]----------------------------------------
+class APIService {
+  private baseApiPath =
+    // @ts-ignore
+    import.meta.env.VITE_ENVIRONMENT === "production"
+      ? // @ts-ignore
+        import.meta.env.VITE_API_PROD_URL
+      : // @ts-ignore
+        import.meta.env.VITE_API_DEV_URL;
+  private baseApiBooksPath = this.baseApiPath + "/categories";
+  private baseApiSongsPath = this.baseApiPath + "/songs";
+  private baseApiVersesPath = this.baseApiPath + "/verses";
+
+  get routes(): APIRoute {
+    return {
+      get: {
+        books: {
+          all: this.baseApiBooksPath.concat("/all/"),
+          byId: this.baseApiBooksPath,
+        },
+        songs: {
+          all: this.baseApiSongsPath.concat("/all/"),
+          byBookId: this.baseApiSongsPath.concat("/all/category/"),
+          bySongId: this.baseApiSongsPath,
+        },
+        verses: {
+          bySongId: this.baseApiVersesPath.concat("/song/"),
+          byVerseId: this.baseApiVersesPath,
+        },
+      },
+      post: {
+        songs: {
+          favorites: this.baseApiSongsPath.concat("/favorites/"),
+        },
+      },
+    };
   }
 
-  /**
-   * Sends an api request to the parent window.
-   * @param requestPayload The info to send with the request
-   */
-  request(requestPayload: ApiRequestPayload) {
-    const request: ApiRequest = {
-      action: "api",
-      payload: requestPayload,
-    };
-    parentWindowService.request(request);
+  async request<ResponseType>(
+    apiPath: string,
+    config?: APIRequestConfig
+  ): Promise<AxiosResponse<ResponseType> | AxiosError<any, any>> {
+    try {
+      return await axios(`${apiPath}`, config);
+    } catch (error) {
+      return <AxiosError<any, any>>error;
+    }
   }
 }
 
-export const apiService = new ApiService();
+export const apiService = new APIService();

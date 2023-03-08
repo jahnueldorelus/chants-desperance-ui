@@ -1,5 +1,5 @@
 import Container from "react-bootstrap/Container";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Book } from "@app-types/entities/books";
 import { BookSelector } from "./components/book-selector";
 import { SongSelector } from "./components/song-selector";
@@ -10,7 +10,8 @@ import { bookService } from "@services/books";
 export const Songs = () => {
   const [searchParams] = useSearchParams();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const [books, setBooks] = useState<Book[]>([]);
+  const [books, setBooks] = useState<Book[] | null>(null);
+  const loadingBooks = useRef(true);
 
   /**
    * Retrieves the list of books and sets the selected book if
@@ -41,6 +42,7 @@ export const Songs = () => {
       }
 
       setBooks(booksList || []);
+      loadingBooks.current = false;
     };
 
     getBooks();
@@ -52,6 +54,7 @@ export const Songs = () => {
         books={books}
         setSelectedBook={setSelectedBook}
         visible={!selectedBook}
+        loadingBooks={loadingBooks.current}
       />
       <SongSelector book={selectedBook} setSelectedBook={setSelectedBook} />
     </Container>

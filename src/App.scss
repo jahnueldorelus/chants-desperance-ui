@@ -65,11 +65,6 @@ img {
   width: fit-content !important;
 }
 
-// Sets width of an element to it's full potential size
-.w-full {
-  width: 100%;
-}
-
 // 1. BOOTSTRAP VARIABLE OVERIDES
 $primary: #383f51;
 $secondary: #dddbf1;
@@ -122,7 +117,7 @@ $theme-colors: (
 @import "@bootstrap/scss/nav";
 @import "@bootstrap/scss/navbar";
 @import "@bootstrap/scss/card";
-// @import "@bootstrap/scss/accordion";
+@import "@bootstrap/scss/accordion";
 // @import "@bootstrap/scss/breadcrumb";
 // @import "@bootstrap/scss/pagination";
 @import "@bootstrap/scss/badge";

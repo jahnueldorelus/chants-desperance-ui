@@ -2,16 +2,19 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
+import Placeholder from "react-bootstrap/Placeholder";
 import Button from "react-bootstrap/Button";
 import { useState } from "react";
 import { Book } from "@app-types/entities/books";
 import { useSearchParams } from "react-router-dom";
 import { uiSearchParams } from "@components/header/uiSearchParams";
+import "./index.scss";
 
 type BookSelectorProps = {
   setSelectedBook: (book: Book) => void;
   visible: boolean;
-  books: Book[];
+  books: Book[] | null;
+  loadingBooks: boolean;
 };
 
 export const BookSelector = (props: BookSelectorProps) => {
@@ -52,9 +55,12 @@ export const BookSelector = (props: BookSelectorProps) => {
    */
   const bookListItemJSX = (book: Book) => {
     return (
-      <Col className="mb-4">
-        <div className="px-3 py-3 d-flex justify-content-between border rounded">
-          <div className="d-flex flex-column justify-content-between">
+      <Col className="px-2 py-2 mb-1">
+        <div className="book-list-item px-3 py-3 d-flex flex-wrap justify-content-between border rounded">
+          <Col
+            className="book-list-item-text d-flex flex-column justify-content-between"
+            xs={9}
+          >
             <div>
               <h5 className="mb-0 text-primary">{book.name}</h5>
               <h6 className="mb-3">({book.abbrv})</h6>
@@ -62,12 +68,15 @@ export const BookSelector = (props: BookSelectorProps) => {
             <div>
               <h6 className="mb-0">{book.numOfSongs} Songs</h6>
             </div>
-          </div>
-          <div className="d-flex align-items-center">
+          </Col>
+          <Col
+            className="book-list-item-btn d-flex justify-content-end align-items-center"
+            xs={3}
+          >
             <Button type="button" onClick={onBookClick(book)}>
               Open
             </Button>
-          </div>
+          </Col>
         </div>
       </Col>
     );
@@ -77,41 +86,63 @@ export const BookSelector = (props: BookSelectorProps) => {
    * Creates a book list depending on selected book language.
    */
   const getBooksListJSX = () => {
-    return (
-      <Row xs={1} md={4}>
-        {props.books.map((book) => {
-          // Returns books that are both kreyol and french
-          if (
-            selectedTab === tabKeys.kreyolFrench &&
-            book.lang === tabKeys.kreyolFrench
-          ) {
-            return bookListItemJSX(book);
-          }
+    if (props.loadingBooks) {
+      return (
+        <Row xs={1} md={3}>
+          {[1, 2, 3].map(() => {
+            return (
+              <Col className="px-2 py-2 mb-1">
+                <div className="px-3 py-3 border rounded">
+                  <Placeholder animation="glow">
+                    <Placeholder xs={8} />
+                    <Placeholder className="d-block" xs={2} />
+                    <Placeholder className="mt-3 d-block" xs={3} />
+                  </Placeholder>
+                </div>
+              </Col>
+            );
+          })}
+        </Row>
+      );
+    } else if (props.books) {
+      return (
+        <Row xs={1} md={2} lg={3}>
+          {props.books.map((book) => {
+            // Returns books that are both kreyol and french
+            if (
+              selectedTab === tabKeys.kreyolFrench &&
+              book.lang === tabKeys.kreyolFrench
+            ) {
+              return bookListItemJSX(book);
+            }
 
-          // Returns french books
-          else if (
-            selectedTab === tabKeys.french &&
-            book.lang === tabKeys.french
-          ) {
-            return bookListItemJSX(book);
-          }
+            // Returns french books
+            else if (
+              selectedTab === tabKeys.french &&
+              book.lang === tabKeys.french
+            ) {
+              return bookListItemJSX(book);
+            }
 
-          // Returns kreyol books
-          else if (
-            selectedTab === tabKeys.kreyol &&
-            book.lang === tabKeys.kreyol
-          ) {
-            return bookListItemJSX(book);
-          }
+            // Returns kreyol books
+            else if (
+              selectedTab === tabKeys.kreyol &&
+              book.lang === tabKeys.kreyol
+            ) {
+              return bookListItemJSX(book);
+            }
 
-          return <></>;
-        })}
-      </Row>
-    );
+            return <></>;
+          })}
+        </Row>
+      );
+    } else {
+      return <></>;
+    }
   };
 
   return (
-    <div className={props.visible ? "d-block" : "d-none"}>
+    <div className={props.visible ? "view-songs" : "d-none"}>
       <h2 className="text-tertiary">Books</h2>
 
       <Tabs

@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import Reveal from "reveal.js";
 import CloseIcon from "@assets/close.svg";
 import FullscreenIcon from "@assets/fullscreen.svg";
-import "./index.scss";
 import { screenService } from "@services/screen";
+import "./index.scss";
 
 export const Slideshow = () => {
   const [firstInitialization, setFirstInitialization] = useState(true);
@@ -20,17 +20,13 @@ export const Slideshow = () => {
         center: false,
         disableLayout: true,
       });
+
       slideshowService.initialized = true;
+      setFirstInitialization(false);
     }
 
     slideshowService.enablePageScroll();
   }, []);
-
-  useEffect(() => {
-    if (firstInitialization) {
-      setFirstInitialization(false);
-    }
-  }, [isVisible]);
 
   /**
    * Creates the correct container class for the slideshow

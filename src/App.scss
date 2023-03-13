@@ -9,6 +9,11 @@ button {
   }
 }
 
+// Sets the default styles of an image
+img {
+  pointer-events: none;
+}
+
 // Adds a box-shadow style in replacement of an outline
 @mixin setBoxShadowOutline($newColor) {
   outline: 0;

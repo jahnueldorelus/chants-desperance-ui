@@ -5,6 +5,7 @@ import Col from "react-bootstrap/Col";
 
 type SongsListDesktopViewProps = {
   songs: Song[];
+  onSongClick: (song: Song) => () => void;
 };
 
 export const DesktopViewSongsList = (props: SongsListDesktopViewProps) => {
@@ -23,13 +24,13 @@ export const DesktopViewSongsList = (props: SongsListDesktopViewProps) => {
         <tbody>
           {props.songs.map((song) => {
             return (
-              <tr>
+              <tr className="align-middle">
                 <td>{song.bookNum}</td>
                 <td>{song.name}</td>
                 <td>{song.numOfVerses}</td>
                 <td>{song.hasChorus ? "Yes" : "No"}</td>
                 <td>
-                  <Button>Open</Button>
+                  <Button onClick={props.onSongClick(song)}>Open</Button>
                 </td>
               </tr>
             );

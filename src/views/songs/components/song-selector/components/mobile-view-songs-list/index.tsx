@@ -4,6 +4,7 @@ import Accordion from "react-bootstrap/Accordion";
 
 type SongsListMobileViewProps = {
   songs: Song[];
+  onSongClick: (song: Song) => () => void;
 };
 
 export const MobileViewSongsList = (props: SongsListMobileViewProps) => {
@@ -38,7 +39,9 @@ export const MobileViewSongsList = (props: SongsListMobileViewProps) => {
                 </p>
               </div>
 
-              <Button className="mt-3 w-100">Open</Button>
+              <Button className="mt-3 w-100" onClick={props.onSongClick(song)}>
+                Open
+              </Button>
             </Accordion.Body>
           </Accordion.Item>
         );

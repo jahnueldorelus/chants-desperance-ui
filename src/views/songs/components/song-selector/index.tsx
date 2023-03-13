@@ -10,10 +10,13 @@ import { songsService } from "@services/songs";
 import { Song } from "@app-types/entities/songs";
 import { DesktopViewSongsList } from "@views/songs/components/song-selector/components/desktop-view-songs-list";
 import { MobileViewSongsList } from "@views/songs/components/song-selector/components/mobile-view-songs-list";
+import { bookService } from "@services/books";
 
 type SongSelectorProps = {
   book: Book | null;
+  song: Song | null;
   setSelectedBook: (book: Book | null) => void;
+  setSelectedSong: (song: Song | null) => void;
 };
 
 export const SongSelector = (props: SongSelectorProps) => {
@@ -41,6 +44,13 @@ export const SongSelector = (props: SongSelectorProps) => {
         songsList = songsList.sort(
           (songOne, songTwo) => songOne.bookNum - songTwo.bookNum
         );
+
+        // Sets the selected song if a song id is found within the URL
+        const urlSongId = searchParams.get(uiSearchParams.song);
+        const tempSong = songsList.find((song) => song._id === urlSongId);
+        if (tempSong) {
+          props.setSelectedSong(tempSong);
+        }
       }
 
       setSongs(songsList || []);
@@ -66,20 +76,13 @@ export const SongSelector = (props: SongSelectorProps) => {
   };
 
   /**
-   * Retrieves the language of the selected book.
+   * Handles clicking a song.
+   * @param song The song the user selected
    */
-  const getBookLang = () => {
-    if (props.book) {
-      if (props.book.lang === "fr") {
-        return "French";
-      } else if (props.book.lang === "kr") {
-        return "Kreyol";
-      } else {
-        return "Kreyol and French";
-      }
-    } else {
-      return "";
-    }
+  const onClickSong = (song: Song) => () => {
+    searchParams.set(uiSearchParams.song, song._id);
+    setSearchParams(searchParams);
+    props.setSelectedSong(song);
   };
 
   /**
@@ -89,7 +92,7 @@ export const SongSelector = (props: SongSelectorProps) => {
     if (loadingSongs) {
       return (
         <Col className="mt-3" xs={4}>
-          {[1, 2, 3].map(() => (
+          {[1, 2].map(() => (
             <div className="px-3 py-3 mb-3 border rounded">
               <Placeholder animation="glow">
                 <Placeholder xs={8} />
@@ -103,8 +106,8 @@ export const SongSelector = (props: SongSelectorProps) => {
     } else if (songs && songs.length > 0) {
       return (
         <Fragment>
-          <DesktopViewSongsList songs={songs} />
-          <MobileViewSongsList songs={songs} />
+          <DesktopViewSongsList songs={songs} onSongClick={onClickSong} />
+          <MobileViewSongsList songs={songs} onSongClick={onClickSong} />
         </Fragment>
       );
     } else {
@@ -116,7 +119,7 @@ export const SongSelector = (props: SongSelectorProps) => {
     }
   };
 
-  if (props.book) {
+  if (props.book && !props.song) {
     return (
       <div>
         <Button type="button" onClick={onClickGoBack}>
@@ -127,7 +130,7 @@ export const SongSelector = (props: SongSelectorProps) => {
           <h2 className="text-tertiary">{props.book.name}</h2>
           <h4>
             <Badge className="ms-3" bg="tertiary">
-              {getBookLang()}
+              {bookService.getBookLanguage(props.book)}
             </Badge>
           </h4>
         </div>

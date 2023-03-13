@@ -67,9 +67,11 @@ function App() {
       <header ref={headerRef}>
         <AppHeader />
       </header>
+
       <main style={{ minHeight: minimumContentHeight }}>
         <Outlet />
       </main>
+
       <footer ref={footerRef}>
         <AppFooter />
       </footer>

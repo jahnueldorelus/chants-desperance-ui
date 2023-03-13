@@ -1,3 +1,4 @@
 export const uiSearchParams = {
-  book: "book",
+  book: "bookId",
+  song: "songId",
 };

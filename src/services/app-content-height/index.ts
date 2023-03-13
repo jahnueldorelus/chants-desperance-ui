@@ -3,16 +3,14 @@ import { RefObject } from "react";
 class AppContentHeight {
   headerRef: RefObject<HTMLElement> | null;
   footerRef: RefObject<HTMLElement> | null;
-  backToJayCloudRef: RefObject<HTMLElement> | null;
-  isLocationLoadService: boolean;
   setMinContentHeight: ((newHeight: number) => void) | null;
+  contentHeight: number;
 
   constructor() {
     this.headerRef = null;
     this.footerRef = null;
-    this.backToJayCloudRef = null;
-    this.isLocationLoadService = false;
     this.setMinContentHeight = null;
+    this.contentHeight = 0;
   }
 
   /**
@@ -22,24 +20,28 @@ class AppContentHeight {
   calculateNewHeight = () => {
     if (this.setMinContentHeight) {
       if (
-        this.isLocationLoadService &&
-        this.backToJayCloudRef &&
-        this.backToJayCloudRef.current
-      ) {
-        this.setMinContentHeight(
-          window.innerHeight - this.backToJayCloudRef.current.offsetHeight
-        );
-      } else if (
         this.headerRef &&
         this.headerRef.current &&
         this.footerRef &&
         this.footerRef.current
       ) {
-        this.setMinContentHeight(
-          window.innerHeight -
+        if (window.visualViewport) {
+          const tempHeight =
+            window.visualViewport.height -
             this.headerRef.current.offsetHeight -
-            this.footerRef.current.offsetHeight
-        );
+            this.footerRef.current.offsetHeight;
+
+          this.setMinContentHeight(tempHeight);
+          this.contentHeight = tempHeight;
+        } else {
+          const tempHeight =
+            window.innerHeight -
+            this.headerRef.current.offsetHeight -
+            this.footerRef.current.offsetHeight;
+
+          this.setMinContentHeight(tempHeight);
+          this.contentHeight = tempHeight;
+        }
       }
     }
   };

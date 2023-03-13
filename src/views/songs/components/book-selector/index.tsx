@@ -4,13 +4,14 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Placeholder from "react-bootstrap/Placeholder";
 import Button from "react-bootstrap/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Book } from "@app-types/entities/books";
 import { useSearchParams } from "react-router-dom";
 import { uiSearchParams } from "@components/header/uiSearchParams";
 import "./index.scss";
 
 type BookSelectorProps = {
+  selectedBook: Book | null;
   setSelectedBook: (book: Book) => void;
   visible: boolean;
   books: Book[] | null;
@@ -25,6 +26,23 @@ export const BookSelector = (props: BookSelectorProps) => {
     kreyolFrench: "kr-fr",
   };
   const [selectedTab, setSelectedTab] = useState(tabKeys.french);
+
+  /**
+   * Sets the selected language tab upon page refresh if a book
+   * was selected during the initial render of the parent component.
+   */
+  useEffect(() => {
+    if (props.selectedBook) {
+      const tempBook = props.selectedBook;
+      const bookLanguageKey = Object.values(tabKeys).find(
+        (key) => key === tempBook.lang
+      );
+
+      if (bookLanguageKey) {
+        onTabSelect(bookLanguageKey);
+      }
+    }
+  }, [props.selectedBook]);
 
   /**
    * Sets the new selected tab key.
@@ -149,6 +167,7 @@ export const BookSelector = (props: BookSelectorProps) => {
         id="book-type-tabs"
         className="my-4"
         defaultActiveKey={selectedTab}
+        activeKey={selectedTab}
         onSelect={onTabSelect}
       >
         <Tab eventKey={tabKeys.french} title="French">

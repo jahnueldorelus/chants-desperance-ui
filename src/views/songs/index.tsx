@@ -1,15 +1,18 @@
 import Container from "react-bootstrap/Container";
 import { useEffect, useState, useRef } from "react";
 import { Book } from "@app-types/entities/books";
-import { BookSelector } from "./components/book-selector";
-import { SongSelector } from "./components/song-selector";
+import { BookSelector } from "@views/songs/components/book-selector";
+import { SongSelector } from "@views/songs/components/song-selector";
+import { SongView } from "@views/songs/components/song-view";
 import { useSearchParams } from "react-router-dom";
 import { uiSearchParams } from "@components/header/uiSearchParams";
 import { bookService } from "@services/books";
+import { Song } from "@app-types/entities/songs";
 
 export const Songs = () => {
   const [searchParams] = useSearchParams();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [books, setBooks] = useState<Book[] | null>(null);
   const loadingBooks = useRef(true);
 
@@ -52,11 +55,24 @@ export const Songs = () => {
     <Container className="py-5">
       <BookSelector
         books={books}
+        selectedBook={selectedBook}
         setSelectedBook={setSelectedBook}
         visible={!selectedBook}
         loadingBooks={loadingBooks.current}
       />
-      <SongSelector book={selectedBook} setSelectedBook={setSelectedBook} />
+
+      <SongSelector
+        book={selectedBook}
+        song={selectedSong}
+        setSelectedBook={setSelectedBook}
+        setSelectedSong={setSelectedSong}
+      />
+
+      <SongView
+        book={selectedBook}
+        song={selectedSong}
+        setSelectedSong={setSelectedSong}
+      />
     </Container>
   );
 };

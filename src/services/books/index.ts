@@ -32,6 +32,19 @@ class BookService {
       return response.data;
     }
   }
+
+  /**
+   * Retrieves the language of a book.
+   */
+  getBookLanguage = (book: Book) => {
+    if (book.lang === "fr") {
+      return "French";
+    } else if (book.lang === "kr") {
+      return "Kreyol";
+    } else {
+      return "Kreyol and French";
+    }
+  };
 }
 
 export const bookService = new BookService();

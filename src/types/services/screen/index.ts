@@ -1,29 +1,17 @@
-import { ParentWindowMessage } from "@app-types/services/parent-window";
-
-export interface ScreenRequest
-  extends Pick<Partial<ParentWindowMessage>, "action"> {
-  action: "enter-fullscreen" | "exit-fullscreen";
+// Allows for specific browser fullscreen methods to be available
+export interface BrowserDocument extends Document {
+  webkitExitFullscreen?: any;
+  msExitFullscreen?: any;
+  cancelFullScreen?: any;
+  mozCancelFullScreen?: any;
+  isFullScreen?: any;
+  webkitFullscreenElement?: any;
+  mozFullScreenElement?: any;
+  msFullscreenElement?: any;
 }
-
-export interface EnterFullScreenRequest extends ScreenRequest {
-  action: "enter-fullscreen";
+export interface BrowserDocumentElement extends HTMLElement {
+  webkitRequestFullscreen?: any;
+  msRequestFullscreen?: any;
+  requestFullScreen?: any;
+  mozRequestFullScreen?: any;
 }
-
-export interface ExitFullScreenRequest extends ScreenRequest {
-  action: "exit-fullscreen";
-}
-
-export interface FullscreenStatusResponse extends ParentWindowMessage {
-  action: "fullscreen-mode";
-  payload: boolean;
-}
-
-/**
- * Determines if a message from the parent window is a fullscreen response.
- * @param messageEventData The message event data to check
- */
-export const isFullscreenStatusMessage = (
-  messageEventData: FullscreenStatusResponse
-): messageEventData is FullscreenStatusResponse => {
-  return messageEventData.action === "fullscreen-mode";
-};

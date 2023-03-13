@@ -146,8 +146,8 @@ export const SongView = (props: SongViewProps) => {
 
           <Col className="mt-3" md={5}>
             <div className="px-3 py-3 border rounded">
-              {[1, 2, 3].map(() => (
-                <Placeholder animation="glow">
+              {[1, 2, 3].map((num) => (
+                <Placeholder animation="glow" key={num}>
                   <Placeholder xs={12} />
                   <Placeholder className="d-block" xs={5} />
                   <Placeholder className="mt-1 mb-2 d-block" xs={8} />
@@ -223,10 +223,10 @@ export const SongView = (props: SongViewProps) => {
 
             <div className="px-3 pb-4 text-center">
               {verses.map((item) => (
-                <div className="mt-4">
+                <div className="mt-4" key={item._id}>
                   <h6>{versesService.getVerseNumber(item, song)}</h6>
-                  {item.verse.split("\n").map((verse) => (
-                    <h6>{verse}</h6>
+                  {item.verse.split("\n").map((verse, index) => (
+                    <h6 key={index}>{verse}</h6>
                   ))}
                 </div>
               ))}

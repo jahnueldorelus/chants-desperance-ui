@@ -73,7 +73,7 @@ export const BookSelector = (props: BookSelectorProps) => {
    */
   const bookListItemJSX = (book: Book) => {
     return (
-      <Col className="px-2 py-2 mb-1">
+      <Col className="px-2 py-2 mb-1" key={book._id}>
         <div className="book-list-item px-3 py-3 d-flex flex-wrap justify-content-between border rounded">
           <Col
             className="book-list-item-text d-flex flex-column justify-content-between"
@@ -107,9 +107,9 @@ export const BookSelector = (props: BookSelectorProps) => {
     if (props.loadingBooks) {
       return (
         <Row xs={1} md={3}>
-          {[1, 2, 3].map(() => {
+          {[1, 2, 3].map((num) => {
             return (
-              <Col className="px-2 py-2 mb-1">
+              <Col className="px-2 py-2 mb-1" key={num}>
                 <div className="px-3 py-3 border rounded">
                   <Placeholder animation="glow">
                     <Placeholder xs={8} />
@@ -125,33 +125,12 @@ export const BookSelector = (props: BookSelectorProps) => {
     } else if (props.books) {
       return (
         <Row xs={1} md={2} lg={3}>
-          {props.books.map((book) => {
-            // Returns books that are both kreyol and french
-            if (
-              selectedTab === tabKeys.kreyolFrench &&
-              book.lang === tabKeys.kreyolFrench
-            ) {
+          {props.books
+            .filter((book) => book.lang === selectedTab)
+            .map((book) => {
+              // Only returns JSX for books that are the selected language(s)
               return bookListItemJSX(book);
-            }
-
-            // Returns french books
-            else if (
-              selectedTab === tabKeys.french &&
-              book.lang === tabKeys.french
-            ) {
-              return bookListItemJSX(book);
-            }
-
-            // Returns kreyol books
-            else if (
-              selectedTab === tabKeys.kreyol &&
-              book.lang === tabKeys.kreyol
-            ) {
-              return bookListItemJSX(book);
-            }
-
-            return <></>;
-          })}
+            })}
         </Row>
       );
     } else {

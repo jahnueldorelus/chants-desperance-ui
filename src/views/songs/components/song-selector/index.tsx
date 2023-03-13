@@ -92,8 +92,8 @@ export const SongSelector = (props: SongSelectorProps) => {
     if (loadingSongs) {
       return (
         <Col className="mt-3" xs={4}>
-          {[1, 2].map(() => (
-            <div className="px-3 py-3 mb-3 border rounded">
+          {[1, 2].map((num) => (
+            <div className="px-3 py-3 mb-3 border rounded" key={num}>
               <Placeholder animation="glow">
                 <Placeholder xs={8} />
                 <Placeholder className="d-block" xs={5} />

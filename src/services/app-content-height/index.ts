@@ -14,8 +14,9 @@ class AppContentHeight {
   }
 
   /**
-   * Sets the minimum height of the main content. This makes the
-   * content on the page to have the full height of the window.
+   * Sets the minimum height of the main content and the height of the root
+   * element. This makes the main content on the page to have the full height
+   * of the window.
    */
   calculateNewHeight = () => {
     if (this.setMinContentHeight) {
@@ -25,6 +26,11 @@ class AppContentHeight {
         this.footerRef &&
         this.footerRef.current
       ) {
+        document.documentElement.style.setProperty(
+          "height",
+          (window.visualViewport?.height || window.innerHeight) + "px"
+        );
+
         if (window.visualViewport) {
           const tempHeight =
             window.visualViewport.height -

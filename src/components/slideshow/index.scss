@@ -150,6 +150,6 @@
 /* Fixes Reveal.js overriding styling causing incorrect height calculations on some devices (like iOS) */
 html {
   overflow: initial !important;
-  height: 100% !important;
+  min-height: 100% !important;
   width: 100% !important;
 }

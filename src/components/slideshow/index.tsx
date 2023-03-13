@@ -13,12 +13,15 @@ export const Slideshow = () => {
   useEffect(() => {
     slideshowService.setSlideshowVisibility = setIsVisible;
 
-    Reveal.initialize({
-      // Shows the slide number
-      slideNumber: true,
-      center: false,
-      disableLayout: true,
-    });
+    if (!slideshowService.initialized) {
+      Reveal.initialize({
+        // Shows the slide number
+        slideNumber: true,
+        center: false,
+        disableLayout: true,
+      });
+      slideshowService.initialized = true;
+    }
 
     slideshowService.enablePageScroll();
   }, []);

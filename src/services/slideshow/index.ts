@@ -7,10 +7,12 @@ import { screenService } from "@services/screen";
 class SlideshowService {
   setSlideshowVisibility: ((v: boolean) => void) | null;
   prevScrollPosition: number;
+  initialized: boolean;
 
   constructor() {
     this.setSlideshowVisibility = null;
     this.prevScrollPosition = 0;
+    this.initialized = false;
   }
 
   /**
@@ -30,10 +32,14 @@ class SlideshowService {
     this.prevScrollPosition =
       (window.pageYOffset || document.documentElement.scrollTop) -
       (document.documentElement.clientTop || 0);
-
-    document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
     this.isSlideshowVisible = true;
     this.disablePageScroll();
+    /**
+     * This must be called after disabling page scroll or a bug
+     * will occur in browsers such as Firefox where the scrollTo method
+     * doesn't work
+     */
+    document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
     Reveal.addEventListeners();
   }
 

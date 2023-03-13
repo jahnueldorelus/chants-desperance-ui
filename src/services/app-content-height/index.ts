@@ -37,7 +37,6 @@ class AppContentHeight {
             this.headerRef.current.offsetHeight -
             this.footerRef.current.offsetHeight;
 
-          console.log("New Height:", tempHeight + "px");
           this.setMinContentHeight(tempHeight);
           this.contentHeight = tempHeight;
         } else {

@@ -1,0 +1,155 @@
+.slideshow {
+  height: 100%;
+
+  &-open {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    -webkit-animation: fadeIn 0.5s;
+    animation: fadeIn 0.5s;
+
+    @-webkit-keyframes fadeIn {
+      from {
+        opacity: 10%;
+        scale: 0.7;
+      }
+      to {
+        opacity: 100%;
+        scale: 1;
+        z-index: 2;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 10%;
+        scale: 0.7;
+      }
+      to {
+        opacity: 100%;
+        scale: 1;
+        z-index: 2;
+      }
+    }
+  }
+
+  &-initial-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    transform: translateY(-100%);
+    z-index: -1000;
+  }
+
+  &-closed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    -webkit-animation-name: fadeOut, translateAfterFadeOut;
+    animation-name: fadeOut, translateAfterFadeOut;
+
+    -webkit-animation-duration: 0.4s, 0s;
+    animation-duration: 0.4s, 0s;
+
+    -webkit-animation-delay: 0s, 0.4s;
+    animation-delay: 0s, 0.4s;
+
+    -webkit-animation-fill-mode: forwards, forwards;
+    animation-fill-mode: forwards, forwards;
+
+    -webkit-animation-timing-function: ease-in, linear;
+    animation-timing-function: ease-in, linear;
+
+    @-webkit-keyframes fadeOut {
+      0% {
+        opacity: 100%;
+        scale: 1;
+      }
+      50% {
+        opacity: 75%;
+        scale: 0.85;
+      }
+      75% {
+        opacity: 50%;
+        scale: 0.75;
+      }
+      100% {
+        opacity: 0%;
+        scale: 0.7;
+      }
+    }
+
+    @keyframes fadeOut {
+      0% {
+        opacity: 100%;
+        scale: 1;
+      }
+      50% {
+        opacity: 75%;
+        scale: 0.85;
+      }
+      75% {
+        opacity: 50%;
+        scale: 0.7;
+      }
+      100% {
+        opacity: 0%;
+        scale: 0.7;
+      }
+    }
+
+    @-webkit-keyframes translateAfterFadeOut {
+      from {
+        transform: translateY(0%);
+      }
+      to {
+        transform: translateY(-100%);
+        z-index: -1000;
+      }
+    }
+
+    @keyframes translateAfterFadeOut {
+      from {
+        transform: translateY(0%);
+      }
+      to {
+        transform: translateY(-100%);
+        z-index: -1000;
+      }
+    }
+  }
+}
+
+.slideshow-controls {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+}
+
+#slideContainer {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    font-size: 7vmin;
+  }
+}
+
+/* Fixes Reveal.js overriding Bootstrap */
+.reveal-viewport {
+  line-height: var(--bs-body-line-height) !important;
+}
+
+/* Fixes Reveal.js overriding styling causing incorrect height calculations on some devices (like iOS) */
+html {
+  overflow: initial !important;
+  min-height: 100% !important;
+  width: 100% !important;
+}

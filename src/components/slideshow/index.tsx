@@ -1,5 +1,5 @@
 import { slideshowService } from "@services/slideshow";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import Reveal from "reveal.js";
 import CloseIcon from "@assets/close.svg";
 import FullscreenIcon from "@assets/fullscreen.svg";
@@ -7,11 +7,10 @@ import { screenService } from "@services/screen";
 import "./index.scss";
 
 export const Slideshow = () => {
-  const [firstInitialization, setFirstInitialization] = useState(true);
-  const [isVisible, setIsVisible] = useState(false);
+  const slideshowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    slideshowService.setSlideshowVisibility = setIsVisible;
+    slideshowService.slideshowRef = slideshowRef;
 
     if (!slideshowService.initialized) {
       Reveal.initialize({
@@ -22,26 +21,10 @@ export const Slideshow = () => {
       });
 
       slideshowService.initialized = true;
-      setFirstInitialization(false);
     }
 
     slideshowService.enablePageScroll();
   }, []);
-
-  /**
-   * Creates the correct container class for the slideshow
-   * for the proper animations to occur.
-   */
-  const slideshowContainerClass = () => {
-    return "slideshow".concat(
-      " ",
-      firstInitialization
-        ? "slideshow-initial-view"
-        : isVisible
-        ? "slideshow-open"
-        : "slideshow-closed"
-    );
-  };
 
   const toggleFullscreen = () => {
     slideshowService.toggleFullscreen();
@@ -83,7 +66,7 @@ export const Slideshow = () => {
   };
 
   return (
-    <div className={slideshowContainerClass()}>
+    <div className="slideshow slideshow-initial-view" ref={slideshowRef}>
       {/* Slide show controls */}
       {slideshowControlsJSX()}
 

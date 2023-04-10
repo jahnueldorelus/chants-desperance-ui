@@ -3,25 +3,35 @@ import { Song } from "@app-types/entities/songs";
 import Reveal from "reveal.js";
 import { versesService } from "@services/verses";
 import { screenService } from "@services/screen";
+import { RefObject } from "react";
 
 class SlideshowService {
-  setSlideshowVisibility: ((v: boolean) => void) | null;
+  slideshowRef: RefObject<HTMLDivElement> | null;
   prevScrollPosition: number;
   initialized: boolean;
 
   constructor() {
-    this.setSlideshowVisibility = null;
+    this.slideshowRef = null;
     this.prevScrollPosition = 0;
     this.initialized = false;
   }
 
   /**
-   * Updates this service and the slideshow component of the
-   * slideshow visibility change.
+   * Updates the class list of the slideshow component to reflect
+   * changes of its visibility.
    */
-  set isSlideshowVisible(visibility: boolean) {
-    if (this.setSlideshowVisibility) {
-      this.setSlideshowVisibility(visibility);
+  set isSlideshowVisible(isVisible: boolean) {
+    if (this.slideshowRef && this.slideshowRef.current) {
+      const slideshow = this.slideshowRef.current;
+
+      if (isVisible) {
+        slideshow.classList.remove("slideshow-initial-view");
+        slideshow.classList.remove("slideshow-closed");
+        slideshow.classList.add("slideshow-open");
+      } else {
+        slideshow.classList.remove("slideshow-open");
+        slideshow.classList.add("slideshow-closed");
+      }
     }
   }
 
@@ -44,7 +54,7 @@ class SlideshowService {
   }
 
   /**
-   * Closes the slide show.
+   * Closes the slideshow.
    */
   closeSlideshow() {
     document.documentElement.scrollTo({

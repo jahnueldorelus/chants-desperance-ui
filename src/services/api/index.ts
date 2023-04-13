@@ -9,9 +9,20 @@ class APIService {
         import.meta.env.VITE_API_PROD_URL
       : // @ts-ignore
         import.meta.env.VITE_API_DEV_URL;
+
   private baseApiBooksPath = this.baseApiPath + "/categories";
   private baseApiSongsPath = this.baseApiPath + "/songs";
   private baseApiVersesPath = this.baseApiPath + "/verses";
+
+  private baseAuthApiPath =
+    // @ts-ignore
+    import.meta.env.VITE_ENVIRONMENT === "production"
+      ? // @ts-ignore
+        import.meta.env.VITE_AUTH_API_PROD_URL
+      : // @ts-ignore
+        import.meta.env.VITE_AUTH_API_DEV_URL;
+
+  private baseAuthUsersPath = this.baseAuthApiPath + "/users";
 
   get routes(): APIRoute {
     return {
@@ -29,11 +40,13 @@ class APIService {
           bySongId: this.baseApiVersesPath.concat("/song/"),
           byVerseId: this.baseApiVersesPath,
         },
+        ssoToken: this.baseAuthUsersPath + "/sso-token",
       },
       post: {
         songs: {
           favorites: this.baseApiSongsPath.concat("/favorites/"),
         },
+        sso: this.baseAuthUsersPath + "/sso",
       },
     };
   }

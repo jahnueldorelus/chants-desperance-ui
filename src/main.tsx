@@ -5,7 +5,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ErrorPage } from "@views/error";
 import { uiRoutes } from "@components/header/uiRoutes";
 import { Songs } from "@views/songs";
+import { Favorites } from "@views/favorites";
 import { Slideshow } from "@components/slideshow";
+import { Authentication } from "@components/authentication";
 
 const router = createBrowserRouter([
   {
@@ -19,7 +21,11 @@ const router = createBrowserRouter([
       },
       {
         path: uiRoutes.favorites,
-        element: <></>,
+        element: (
+          <Authentication>
+            <Favorites />
+          </Authentication>
+        ),
       },
     ],
   },

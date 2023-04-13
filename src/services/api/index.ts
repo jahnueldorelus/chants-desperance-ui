@@ -22,7 +22,7 @@ class APIService {
       : // @ts-ignore
         import.meta.env.VITE_AUTH_API_DEV_URL;
 
-  private baseAuthUsersPath = this.baseAuthApiPath + "/users";
+  private baseAuthUsersPath = this.baseAuthApiPath + "/sso";
 
   get routes(): APIRoute {
     return {

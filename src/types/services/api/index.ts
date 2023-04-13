@@ -15,11 +15,13 @@ export type APIRoute = {
       bySongId: string;
       byVerseId: string;
     };
+    ssoToken: string;
   };
   post: {
     songs: {
       favorites: string;
     };
+    sso: string;
   };
 };
 

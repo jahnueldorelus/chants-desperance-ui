@@ -10,9 +10,9 @@ class APIService {
       : // @ts-ignore
         import.meta.env.VITE_API_DEV_URL;
 
-  private baseApiBooksPath = this.baseApiPath + "/categories";
-  private baseApiSongsPath = this.baseApiPath + "/songs";
-  private baseApiVersesPath = this.baseApiPath + "/verses";
+  private baseApiBooksPath = this.baseApiPath + "/api/categories";
+  private baseApiSongsPath = this.baseApiPath + "/api/songs";
+  private baseApiVersesPath = this.baseApiPath + "/api/verses";
 
   private baseAuthApiPath =
     // @ts-ignore
@@ -22,7 +22,7 @@ class APIService {
       : // @ts-ignore
         import.meta.env.VITE_AUTH_API_DEV_URL;
 
-  private baseAuthUsersPath = this.baseAuthApiPath + "/sso";
+  private baseAuthSSOPath = this.baseAuthApiPath + "/api/sso";
 
   get routes(): APIRoute {
     return {
@@ -40,13 +40,15 @@ class APIService {
           bySongId: this.baseApiVersesPath.concat("/song/"),
           byVerseId: this.baseApiVersesPath,
         },
-        ssoToken: this.baseAuthUsersPath + "/sso-token",
+        ssoToken: this.baseAuthSSOPath + "/sso-token",
       },
       post: {
         songs: {
           favorites: this.baseApiSongsPath.concat("/favorites/"),
         },
-        sso: this.baseAuthUsersPath + "/sso",
+        sso: this.baseAuthSSOPath + "/sso",
+        ssoUser: this.baseAuthSSOPath + "/sso-user",
+        ssoDataToApi: this.baseAuthSSOPath + "/sso-data",
       },
     };
   }

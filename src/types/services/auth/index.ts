@@ -9,3 +9,12 @@ export type AuthInitiatorResponse = {
 export type SSOTokenResponse = {
   token: string;
 };
+
+export type UserDataRequest = {
+  token: string;
+};
+
+export type UserData = {
+  firstName: string;
+  lastName: string;
+};

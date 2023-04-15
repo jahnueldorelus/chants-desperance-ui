@@ -22,15 +22,26 @@ export type APIRoute = {
       favorites: string;
     };
     sso: string;
+    ssoUser: string;
+    ssoDataToApi: string;
   };
 };
 
+export type APIRequestMethod = Method;
+
 export interface APIRequestConfig extends AxiosRequestConfig {
-  method: Method;
+  method: APIRequestMethod;
 }
 
 export type DataRequest = {
   serviceId: string;
   apiPath: string;
   apiMethod: string;
+};
+
+export type SSODataRequest = {
+  [key: string]: string;
+  apiUrl: string;
+  apiHost: string;
+  apiMethod: APIRequestMethod;
 };

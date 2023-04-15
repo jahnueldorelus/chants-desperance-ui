@@ -1,5 +1,6 @@
 import { Song } from "@app-types/entities/songs";
 import { apiService } from "@services/api";
+import { authService } from "@services/auth";
 import { isAxiosError } from "axios";
 
 class SongsService {
@@ -54,16 +55,16 @@ class SongsService {
    * Retrieves the list of the user's favorite songs
    * @param songIds The list of song ids to retrieve the info of
    */
-  async getAllFavoriteSongs(songIds: string[]) {
-    const response = await apiService.request<Song[]>(
+  async getAllFavoriteSongs(): Promise<Song[] | null> {
+    const response = await authService.sendSSODataToAPI(
       apiService.routes.post.songs.favorites,
-      { method: "POST", data: songIds }
+      "POST"
     );
 
     if (isAxiosError(response)) {
       return null;
     } else {
-      return response.data;
+      return <Song[]>response.data;
     }
   }
 }

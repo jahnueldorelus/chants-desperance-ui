@@ -55,7 +55,7 @@ export const Authentication = (props: AuthenticationProps) => {
   // If an attempt is in progress to authorize the user
   else if (authProcessing || authUrl) {
     return (
-      <Container className="py-5 d-flex flex-column align-items-center">
+      <Container className="py-5 d-flex flex-column align-items-center text-center">
         <Spinner
           className="mt-5"
           animation="grow"
@@ -65,7 +65,7 @@ export const Authentication = (props: AuthenticationProps) => {
         >
           <span className="visually-hidden">Loading...</span>
         </Spinner>
-        <h1 className="pt-4 text-tertiary">Attempting to sign in.</h1>
+        <h1 className="pt-4 text-tertiary">Signing in, please wait a moment</h1>
       </Container>
     );
   }

@@ -5,12 +5,11 @@ import Placeholder from "react-bootstrap/Placeholder";
 import Col from "react-bootstrap/Col";
 import { useSearchParams } from "react-router-dom";
 import Badge from "react-bootstrap/Badge";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { songsService } from "@services/songs";
 import { Song } from "@app-types/entities/songs";
-import { DesktopViewSongsList } from "@views/songs/components/song-selector/components/desktop-view-songs-list";
-import { MobileViewSongsList } from "@views/songs/components/song-selector/components/mobile-view-songs-list";
 import { bookService } from "@services/books";
+import { SongsListView } from "./components/songs-list-view";
 
 type SongSelectorProps = {
   book: Book | null;
@@ -79,7 +78,7 @@ export const SongSelector = (props: SongSelectorProps) => {
    * Handles clicking a song.
    * @param song The song the user selected
    */
-  const onClickSong = (song: Song) => () => {
+  const onSongClick = (song: Song) => () => {
     searchParams.set(uiSearchParams.song, song._id);
     setSearchParams(searchParams);
     props.setSelectedSong(song);
@@ -104,12 +103,7 @@ export const SongSelector = (props: SongSelectorProps) => {
         </Col>
       );
     } else if (songs && songs.length > 0) {
-      return (
-        <Fragment>
-          <DesktopViewSongsList songs={songs} onSongClick={onClickSong} />
-          <MobileViewSongsList songs={songs} onSongClick={onClickSong} />
-        </Fragment>
-      );
+      return <SongsListView songs={songs} onSongClick={onSongClick} />;
     } else {
       return (
         <div className="mt-3">

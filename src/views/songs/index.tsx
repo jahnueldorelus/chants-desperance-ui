@@ -72,6 +72,7 @@ export const Songs = () => {
         book={selectedBook}
         song={selectedSong}
         setSelectedSong={setSelectedSong}
+        isSongAFavorite={false} // REPLACE THIS IN FUTURE
       />
     </Container>
   );

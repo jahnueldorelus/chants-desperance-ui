@@ -21,6 +21,7 @@ type SongViewProps = {
   book: Book | null;
   song: Song | null;
   setSelectedSong: (song: Song | null) => void;
+  isSongAFavorite: boolean;
 };
 
 export const SongView = (props: SongViewProps) => {
@@ -124,6 +125,7 @@ export const SongView = (props: SongViewProps) => {
     }
   };
 
+  // If the verses of the song are loading
   if (props.book && props.song) {
     if (loadingVerses) {
       return (
@@ -157,7 +159,10 @@ export const SongView = (props: SongViewProps) => {
           </Col>
         </div>
       );
-    } else if (verses) {
+    }
+
+    // If the verses of the sond are available
+    else if (verses) {
       const song = props.song;
       const book = props.book;
 
@@ -178,6 +183,25 @@ export const SongView = (props: SongViewProps) => {
             </div>
 
             <div>
+              {!props.isSongAFavorite && (
+                <Button
+                  className="mt-3 mt-md-0 me-3"
+                  type="button"
+                  onClick={() => {}}
+                >
+                  Add to Favorites
+                </Button>
+              )}
+              {props.isSongAFavorite && (
+                <Button
+                  className="mt-3 mt-md-0 me-3"
+                  type="button"
+                  onClick={() => {}}
+                >
+                  Remove from Favorites
+                </Button>
+              )}
+
               <Button
                 className="mt-3 mt-md-0 me-3"
                 type="button"

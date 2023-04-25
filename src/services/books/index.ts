@@ -36,7 +36,7 @@ class BookService {
   /**
    * Retrieves the language of a book.
    */
-  getBookLanguage = (book: Book) => {
+  getBookLanguage(book: Book) {
     if (book.lang === "fr") {
       return "French";
     } else if (book.lang === "kr") {
@@ -44,7 +44,22 @@ class BookService {
     } else {
       return "Kreyol and French";
     }
-  };
+  }
+
+  /**
+   * Finds a book by book id.
+   */
+  findBookById(
+    books: Book[] | null | undefined,
+    bookId: string | null
+  ): Book | null {
+    if (!books) {
+      return null;
+    }
+
+    const foundBook = books.find((book) => book._id === bookId);
+    return foundBook || null;
+  }
 }
 
 export const bookService = new BookService();

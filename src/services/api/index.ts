@@ -13,6 +13,7 @@ class APIService {
   private baseApiBooksPath = this.baseApiPath + "/api/categories";
   private baseApiSongsPath = this.baseApiPath + "/api/songs";
   private baseApiVersesPath = this.baseApiPath + "/api/verses";
+  private baseApiFavoritesPath = this.baseApiSongsPath + "/favorites";
 
   private baseAuthApiPath =
     // @ts-ignore
@@ -35,6 +36,7 @@ class APIService {
           all: this.baseApiSongsPath.concat("/all/"),
           byBookId: this.baseApiSongsPath.concat("/all/category/"),
           bySongId: this.baseApiSongsPath,
+          favorites: this.baseApiFavoritesPath,
         },
         verses: {
           bySongId: this.baseApiVersesPath.concat("/song/"),
@@ -44,7 +46,8 @@ class APIService {
       },
       post: {
         songs: {
-          favorites: this.baseApiSongsPath.concat("/favorites/"),
+          addFavorite: this.baseApiFavoritesPath.concat("/add"),
+          removeFavorite: this.baseApiFavoritesPath.concat("/remove"),
         },
         sso: this.baseAuthSSOPath + "/sso",
         ssoUser: this.baseAuthSSOPath + "/sso-user",

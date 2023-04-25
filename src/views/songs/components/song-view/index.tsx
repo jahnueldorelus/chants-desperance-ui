@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { uiSearchParams } from "@components/header/uiSearchParams";
 import Button from "react-bootstrap/Button";
 import { Verse } from "@app-types/entities/verses";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { versesService } from "@services/verses";
 import Placeholder from "react-bootstrap/Placeholder";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -16,31 +16,46 @@ import { textFileService } from "@services/text-file";
 import { wordDocService } from "@services/word-doc";
 import { powerPointService } from "@services/power-point";
 import { slideshowService } from "@services/slideshow";
+import { songsService } from "@services/songs";
 
 type SongViewProps = {
   book: Book | null;
   song: Song | null;
   setSelectedSong: (song: Song | null) => void;
-  isSongAFavorite: boolean;
 };
 
 export const SongView = (props: SongViewProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [loadingVerses, setLoadingVerses] = useState(false);
+  const [songIsAFavorite, setSongIsAFavorite] = useState(false);
+  const [updatingFavStatus, setUpdatingFavStatus] = useState(false);
+  const fetchingVersesData = useRef(false);
 
   useEffect(() => {
     getVerses();
   }, [props.song]);
 
   /**
-   * Retrieves the list of verses in the selected sonng if available.
+   * Updates the song's position as a user favorite after a modification is made
+   * to its standing as a favorite song.
+   */
+  useEffect(() => {
+    if (props.song) {
+      setSongIsAFavorite(songsService.isSongAFavorite(props.song));
+    }
+  }, [updatingFavStatus]);
+
+  /**
+   * Retrieves the list of verses in the selected song if available and
+   * determines if the song is a user favorite.
    */
   const getVerses = async () => {
-    if (props.song) {
+    if (props.song && !fetchingVersesData.current) {
       setLoadingVerses(true);
-      let versesList = await versesService.getVerses(props.song._id);
+      fetchingVersesData.current = true;
 
+      let versesList = await versesService.getVerses(props.song._id);
       if (versesList) {
         // Sorts verses by number
         versesList = versesList.sort(
@@ -51,6 +66,8 @@ export const SongView = (props: SongViewProps) => {
 
       setVerses(versesList);
       setLoadingVerses(false);
+      fetchingVersesData.current = false;
+      setSongIsAFavorite(songsService.isSongAFavorite(props.song));
     } else {
       // Resets the list of verses when there's no selected song
       setVerses(null);
@@ -72,9 +89,43 @@ export const SongView = (props: SongViewProps) => {
   };
 
   /**
+   * Adds a song to the user's list of favorites.
+   */
+  const addFavoriteSong = async (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+
+    if (props.song && !updatingFavStatus) {
+      setUpdatingFavStatus(true);
+      await songsService.addFavoriteSong(props.song);
+      setUpdatingFavStatus(false);
+    }
+  };
+
+  /**
+   * Removes a song from the user's list of favorites.
+   */
+  const removeFavoriteSong = async (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+
+    if (props.song && !updatingFavStatus) {
+      setUpdatingFavStatus(true);
+      await songsService.removeFavoriteSong(props.song);
+      setUpdatingFavStatus(false);
+    }
+  };
+
+  /**
    * Sends an email of the selected song using the user's mail client.
    */
-  const onSendEmailClick = () => {
+  const onSendEmailClick = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+
     if (props.book && props.song && verses) {
       emailService.createTextFileFromSong(props.book, props.song, verses);
     }
@@ -83,7 +134,10 @@ export const SongView = (props: SongViewProps) => {
   /**
    * Downloads a text file of the song.
    */
-  const onDownloadTextClick = () => {
+  const onDownloadTextClick = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    event.preventDefault();
     if (props.book && props.song && verses) {
       textFileService.createTextFileFromSong(props.book, props.song, verses);
     }
@@ -92,7 +146,11 @@ export const SongView = (props: SongViewProps) => {
   /**
    * Downloads the song as a word document.
    */
-  const onDownloadWordClick = async () => {
+  const onDownloadWordClick = async (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+
     if (props.book && props.song && verses) {
       await wordDocService.createWordDocumentFromSong(
         props.book,
@@ -105,7 +163,11 @@ export const SongView = (props: SongViewProps) => {
   /**
    * Downloads the song as a powerpoint.
    */
-  const onDownloadPowerPointClick = () => {
+  const onDownloadPowerPointClick = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+
     if (props.book && props.song && verses) {
       powerPointService.createPowerPointFromSong(
         props.book,
@@ -118,7 +180,9 @@ export const SongView = (props: SongViewProps) => {
   /**
    * Presents the song in a slideshow.
    */
-  const openSlideshow = () => {
+  const openSlideshow = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    event.preventDefault();
+
     if (props.song && verses) {
       slideshowService.loadSongIntoSlideshow(verses, props.song);
       slideshowService.openSlideshow();
@@ -183,24 +247,14 @@ export const SongView = (props: SongViewProps) => {
             </div>
 
             <div>
-              {!props.isSongAFavorite && (
-                <Button
-                  className="mt-3 mt-md-0 me-3"
-                  type="button"
-                  onClick={() => {}}
-                >
-                  Add to Favorites
-                </Button>
-              )}
-              {props.isSongAFavorite && (
-                <Button
-                  className="mt-3 mt-md-0 me-3"
-                  type="button"
-                  onClick={() => {}}
-                >
-                  Remove from Favorites
-                </Button>
-              )}
+              <Button
+                className="mt-3 mt-md-0 me-3"
+                type="button"
+                onClick={songIsAFavorite ? removeFavoriteSong : addFavoriteSong}
+                aria-disabled={updatingFavStatus}
+              >
+                {songIsAFavorite ? "Remove from Favorites" : "Add to Favorites"}
+              </Button>
 
               <Button
                 className="mt-3 mt-md-0 me-3"

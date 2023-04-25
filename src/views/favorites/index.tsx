@@ -8,6 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import Container from "react-bootstrap/Container";
 import { useSearchParams } from "react-router-dom";
 import { SongsListView } from "@views/songs/components/song-selector/components/songs-list-view";
+import Placeholder from "react-bootstrap/Placeholder";
+import Col from "react-bootstrap/Col";
 
 export const Favorites = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,8 +17,12 @@ export const Favorites = () => {
   const [books, setBooks] = useState<Book[] | null>(null);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [loadingData, setLoadingData] = useState(false);
   const attemptedAPIRequest = useRef<boolean>(false);
 
+  /**
+   * Retrieves the list of books and the user's favorite songs.
+   */
   useEffect(() => {
     if (!attemptedAPIRequest.current) {
       attemptedAPIRequest.current = true;
@@ -24,6 +30,20 @@ export const Favorites = () => {
     }
   }, []);
 
+  /**
+   * Retrieves the list of the user's favorite songs after they finished
+   * viewing a song. This is due to the possibility of the user removing
+   * a song as their favorite while they were viewing it.
+   */
+  useEffect(() => {
+    if (!selectedSong && books) {
+      getFavoriteSongs();
+    }
+  }, [selectedSong]);
+
+  /**
+   * Retrieves the list of the user's favorite songs.
+   */
   const getFavoriteSongs = async () => {
     const songsList = await songsService.getAllFavoriteSongs();
     setFavoriteSongs(songsList);
@@ -41,7 +61,11 @@ export const Favorites = () => {
     }
   };
 
+  /**
+   * Retrieves the list of books.
+   */
   const getBooks = async () => {
+    setLoadingData(true);
     let booksList = await bookService.getAllBooks();
 
     // Sets the selected book if a book id is found within the URL
@@ -59,6 +83,7 @@ export const Favorites = () => {
     await getFavoriteSongs();
 
     setBooks(booksList || []);
+    setLoadingData(false);
   };
 
   /**
@@ -88,40 +113,62 @@ export const Favorites = () => {
     setSelectedSong(song);
   };
 
+  /**
+   * The JSX of the user's favorite songs.
+   */
+  const favoriteSongsListJSX = () => {
+    if (books && favoriteSongs && favoriteSongs.length > 0) {
+      return (
+        <SongsListView
+          songs={favoriteSongs}
+          books={books}
+          onSongClick={onSongClick}
+        />
+      );
+    } else {
+      return <h4 className="mt-3">No songs found</h4>;
+    }
+  };
+
   // Shows the selected song's verses
-  if (selectedBook && selectedSong) {
+  if (loadingData) {
+    return (
+      <Container className="py-5">
+        <h2 className="text-tertiary">Favorites</h2>
+
+        <Col className="mt-3" xs={4}>
+          {[1, 2].map((num) => (
+            <div className="px-3 py-3 mb-3 border rounded" key={num}>
+              <Placeholder animation="glow">
+                <Placeholder xs={8} />
+                <Placeholder className="d-block" xs={5} />
+                <Placeholder className="mt-3 d-block" xs={6} />
+              </Placeholder>
+            </div>
+          ))}
+        </Col>
+      </Container>
+    );
+  } else if (selectedBook && selectedSong) {
     return (
       <Container className="py-5">
         <SongView
           book={selectedBook}
           song={selectedSong}
           setSelectedSong={setSelectedSong}
-          isSongAFavorite={true} // REPLACE THIS IN FUTURE
         />
       </Container>
     );
   }
   // Shows the user's favorite songs
   else if (books) {
-    if (favoriteSongs && favoriteSongs.length > 0) {
-      return (
-        <Container className="py-5">
-          <h2 className="text-tertiary">Favorites</h2>
+    return (
+      <Container className="py-5">
+        <h2 className="text-tertiary">Favorites</h2>
 
-          <SongsListView
-            songs={favoriteSongs}
-            books={books}
-            onSongClick={onSongClick}
-          />
-        </Container>
-      );
-    } else {
-      return (
-        <div className="mt-3">
-          <h4>No songs found</h4>
-        </div>
-      );
-    }
+        {favoriteSongsListJSX()}
+      </Container>
+    );
   } else {
     return <></>;
   }

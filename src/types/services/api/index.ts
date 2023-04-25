@@ -10,6 +10,7 @@ export type APIRoute = {
       all: string;
       byBookId: string;
       bySongId: string;
+      favorites: string;
     };
     verses: {
       bySongId: string;
@@ -19,7 +20,8 @@ export type APIRoute = {
   };
   post: {
     songs: {
-      favorites: string;
+      addFavorite: string;
+      removeFavorite: string;
     };
     sso: string;
     ssoUser: string;

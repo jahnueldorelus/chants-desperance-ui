@@ -4,6 +4,12 @@ import { authService } from "@services/auth";
 import { isAxiosError } from "axios";
 
 class SongsService {
+  private favorites: Record<string, boolean>;
+
+  constructor() {
+    this.favorites = {};
+  }
+
   /**
    * Retrieves the list of all songs.
    */
@@ -57,15 +63,62 @@ class SongsService {
    */
   async getAllFavoriteSongs(): Promise<Song[] | null> {
     const response = await authService.sendSSODataToAPI(
-      apiService.routes.post.songs.favorites,
-      "POST"
+      apiService.routes.get.songs.favorites,
+      "GET"
     );
 
     if (isAxiosError(response)) {
       return null;
     } else {
-      return <Song[]>response.data;
+      const favoriteSongs = <Song[]>response.data;
+      favoriteSongs.forEach((song) => (this.favorites[song._id] = true));
+
+      return favoriteSongs;
     }
+  }
+
+  /**
+   * Adds a song to the user's list of favorite songs.
+   * @param song The song to add
+   */
+  async addFavoriteSong(song: Song): Promise<void> {
+    const response = await authService.sendSSODataToAPI(
+      apiService.routes.post.songs.addFavorite,
+      "POST",
+      {
+        songId: song._id,
+      }
+    );
+
+    if (!isAxiosError(response)) {
+      this.favorites[song._id] = true;
+    }
+  }
+
+  /**
+   * Removes a song from the user's list of favorite songs.
+   * @param song The song to remove
+   */
+  async removeFavoriteSong(song: Song): Promise<void> {
+    const response = await authService.sendSSODataToAPI(
+      apiService.routes.post.songs.removeFavorite,
+      "POST",
+      {
+        songId: song._id,
+      }
+    );
+
+    if (!isAxiosError(response)) {
+      delete this.favorites[song._id];
+    }
+  }
+
+  /**
+   * Determines if a song is one of the user's favorite songs.
+   * @param song The song to determine if it's a favorite
+   */
+  isSongAFavorite(song: Song): boolean {
+    return !!this.favorites[song._id];
   }
 
   /**

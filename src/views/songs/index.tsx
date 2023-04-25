@@ -10,7 +10,7 @@ import { bookService } from "@services/books";
 import { Song } from "@app-types/entities/songs";
 
 export const Songs = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [books, setBooks] = useState<Book[] | null>(null);
@@ -38,10 +38,13 @@ export const Songs = () => {
 
         // Sets the selected book if a book id is found within the URL
         const urlBookId = searchParams.get(uiSearchParams.book);
-        const tempBook = booksList.find((book) => book._id === urlBookId);
-        if (tempBook) {
-          setSelectedBook(tempBook);
+        const tempBook = bookService.findBookById(booksList, urlBookId);
+
+        if (!tempBook) {
+          resetSearchParams();
         }
+
+        setSelectedBook(tempBook);
       }
 
       setBooks(booksList || []);
@@ -50,6 +53,15 @@ export const Songs = () => {
 
     getBooks();
   }, []);
+
+  /**
+   * Removes the book and song id from the url if they're there.
+   */
+  const resetSearchParams = () => {
+    searchParams.delete(uiSearchParams.book);
+    searchParams.delete(uiSearchParams.song);
+    setSearchParams(searchParams);
+  };
 
   return (
     <Container className="py-5">
@@ -66,6 +78,7 @@ export const Songs = () => {
         song={selectedSong}
         setSelectedBook={setSelectedBook}
         setSelectedSong={setSelectedSong}
+        resetSearchParams={resetSearchParams}
       />
 
       <SongView

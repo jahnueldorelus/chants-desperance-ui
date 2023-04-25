@@ -1,7 +1,6 @@
 import { Book } from "@app-types/entities/books";
 import { Song } from "@app-types/entities/songs";
 import { uiSearchParams } from "@components/header/uiSearchParams";
-import { authService } from "@services/auth";
 import { bookService } from "@services/books";
 import { songsService } from "@services/songs";
 import { SongView } from "@views/songs/components/song-view";
@@ -11,7 +10,6 @@ import { useSearchParams } from "react-router-dom";
 import { SongsListView } from "@views/songs/components/song-selector/components/songs-list-view";
 
 export const Favorites = () => {
-  const userInfo = authService.userInfo;
   const [searchParams, setSearchParams] = useSearchParams();
   const [favoriteSongs, setFavoriteSongs] = useState<Song[] | null>(null);
   const [books, setBooks] = useState<Book[] | null>(null);
@@ -27,21 +25,35 @@ export const Favorites = () => {
   }, []);
 
   const getFavoriteSongs = async () => {
-    const songs = await songsService.getAllFavoriteSongs();
-    setFavoriteSongs(songs);
+    const songsList = await songsService.getAllFavoriteSongs();
+    setFavoriteSongs(songsList);
+
+    // Sets the selected song if a song id is found within the URL
+    if (songsList) {
+      const urlSongId = searchParams.get(uiSearchParams.song);
+      const tempSong = songsService.findSongById(songsList, urlSongId);
+
+      if (!tempSong) {
+        resetSearchParams();
+      }
+
+      setSelectedSong(tempSong);
+    }
   };
 
   const getBooks = async () => {
     let booksList = await bookService.getAllBooks();
 
+    // Sets the selected book if a book id is found within the URL
     if (booksList) {
-      // Sets the selected book if a book id is found within the URL
       const urlBookId = searchParams.get(uiSearchParams.book);
       const tempBook = bookService.findBookById(booksList, urlBookId);
 
-      if (tempBook) {
-        setSelectedBook(tempBook);
+      if (!tempBook) {
+        resetSearchParams();
       }
+
+      setSelectedBook(tempBook);
     }
 
     await getFavoriteSongs();
@@ -50,19 +62,12 @@ export const Favorites = () => {
   };
 
   /**
-   * Creates a text in title case form.
-   * (First letter is capitalized and the rest are
-   * lowercased).
-   * @param text The text to title case
+   * Removes the book and song id from the url if they're there.
    */
-  const titleCase = (text: string): string => {
-    if (text.length === 0) {
-      return "";
-    } else if (text.length === 1) {
-      return text.toLocaleUpperCase();
-    } else {
-      return text[0]?.toLocaleUpperCase() + text.slice(1).toLocaleLowerCase();
-    }
+  const resetSearchParams = () => {
+    searchParams.delete(uiSearchParams.book);
+    searchParams.delete(uiSearchParams.song);
+    setSearchParams(searchParams);
   };
 
   /**
@@ -73,7 +78,7 @@ export const Favorites = () => {
     const songBook = bookService.findBookById(books, song.catId);
 
     if (songBook) {
-      searchParams.set(uiSearchParams.book, song._id);
+      searchParams.set(uiSearchParams.book, songBook._id);
       setSelectedBook(songBook);
     }
 
@@ -83,46 +88,41 @@ export const Favorites = () => {
     setSelectedSong(song);
   };
 
-  if (userInfo) {
-    // Shows the selected song's verses
-    if (selectedBook && selectedSong) {
+  // Shows the selected song's verses
+  if (selectedBook && selectedSong) {
+    return (
+      <Container className="py-5">
+        <SongView
+          book={selectedBook}
+          song={selectedSong}
+          setSelectedSong={setSelectedSong}
+          isSongAFavorite={true} // REPLACE THIS IN FUTURE
+        />
+      </Container>
+    );
+  }
+  // Shows the user's favorite songs
+  else if (books) {
+    if (favoriteSongs && favoriteSongs.length > 0) {
       return (
         <Container className="py-5">
-          <SongView
-            book={selectedBook}
-            song={selectedSong}
-            setSelectedSong={setSelectedSong}
-            isSongAFavorite={true} // REPLACE THIS IN FUTURE
+          <h2 className="text-tertiary">Favorites</h2>
+
+          <SongsListView
+            songs={favoriteSongs}
+            books={books}
+            onSongClick={onSongClick}
           />
         </Container>
       );
+    } else {
+      return (
+        <div className="mt-3">
+          <h4>No songs found</h4>
+        </div>
+      );
     }
-    // Shows the user's favorite songs
-    else if (books) {
-      if (favoriteSongs && favoriteSongs.length > 0) {
-        return (
-          <Container className="py-5">
-            <h1>
-              Welcome home, {titleCase(userInfo.firstName)}&nbsp;
-              {titleCase(userInfo.lastName)}
-            </h1>
-
-            <SongsListView
-              songs={favoriteSongs}
-              books={books}
-              onSongClick={onSongClick}
-            />
-          </Container>
-        );
-      } else {
-        return (
-          <div className="mt-3">
-            <h4>No songs found</h4>
-          </div>
-        );
-      }
-    }
+  } else {
+    return <></>;
   }
-
-  return <></>;
 };

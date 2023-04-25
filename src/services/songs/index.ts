@@ -67,6 +67,21 @@ class SongsService {
       return <Song[]>response.data;
     }
   }
+
+  /**
+   * Finds a song by song id.
+   */
+  findSongById(
+    songs: Song[] | null | undefined,
+    songId: string | null
+  ): Song | null {
+    if (!songs) {
+      return null;
+    }
+
+    const foundSong = songs.find((song) => song._id === songId);
+    return foundSong || null;
+  }
 }
 
 export const songsService = new SongsService();

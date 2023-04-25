@@ -162,6 +162,22 @@ class AuthService {
       }
     );
   }
+
+  /**
+   * Creates a text in title case form.
+   * (First letter is capitalized and the rest are
+   * lowercased).
+   * @param text The text to title case
+   */
+  titleCase(text: string): string {
+    if (text.length === 0) {
+      return "";
+    } else if (text.length === 1) {
+      return text.toLocaleUpperCase();
+    } else {
+      return text[0]?.toLocaleUpperCase() + text.slice(1).toLocaleLowerCase();
+    }
+  }
 }
 
 export const authService = new AuthService();

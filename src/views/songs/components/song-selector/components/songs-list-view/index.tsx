@@ -11,6 +11,7 @@ type SongsListViewProps = {
 };
 
 export const SongsListView = (props: SongsListViewProps) => {
+
   return (
     <Fragment>
       <DesktopViewSongsList

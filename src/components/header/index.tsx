@@ -1,17 +1,98 @@
-import { useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Offcanvas from "react-bootstrap/Offcanvas";
+import Dropdown from "react-bootstrap/Dropdown";
+import Alert from "react-bootstrap/Alert";
+import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
+import CloseButton from "react-bootstrap/CloseButton";
 import { NavLink } from "react-router-dom";
 import { uiRoutes } from "@components/header/uiRoutes";
 import CELogo from "@assets/chants-desperance.png";
-import CloseSvg from "@assets/close.svg";
+import UserSvg from "@assets/user.svg";
+import { authService } from "@services/auth";
+import { userContext } from "@context/user";
 import "./index.scss";
 
 export const AppHeader = () => {
   const mobileNavId = "app-navigation-mobile";
+  const desktopUserMenuId = "app-navigation-desktop-user-menu";
   const [isOffcanvasVisible, setIsOffcanvasVisible] = useState(false);
+  const [isUserDropdownVisible, setIsUserDropdownVisible] = useState(false);
+  const [failedToSignOut, setFailedToSignOut] = useState(false);
+  const attemptedAuthRequest = useRef<boolean>(false);
+  const userConsumer = useContext(userContext);
+
+  /**
+   * Attempts to reauthorize the user if they're already
+   * signed in.
+   */
+  useEffect(() => {
+    if (!attemptedAuthRequest.current) {
+      attemptedAuthRequest.current = true;
+      getUserReauthorized();
+    }
+  }, []);
+
+  // Navigates to the auth url if a url is present
+  useEffect(() => {
+    if (userConsumer.state.ssoAuthUrl) {
+      window.location.replace(userConsumer.state.ssoAuthUrl);
+    }
+  }, [userConsumer.state.ssoAuthUrl]);
+
+  /**
+   * Attempts to get the user's reauthorized.
+   */
+  const getUserReauthorized = async () => {
+    await userConsumer.methods.reauthorizeUser();
+  };
+
+  /**
+   * Attempts to authenticate the user.
+   */
+  const signInUser = async (
+    event?: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    if (event) {
+      event.preventDefault();
+    }
+
+    await userConsumer.methods.signInUser();
+    // setIsOffcanvasVisible(false);
+  };
+
+  /**
+   * Attempts to sign out the user.
+   */
+  const signOutUser = async (
+    event?: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    if (event) {
+      event.preventDefault();
+    }
+
+    const userSignedOut = await userConsumer.methods.signOutUser();
+    // setIsOffcanvasVisible(false);
+
+    if (!userSignedOut) {
+      setFailedToSignOut(true);
+
+      // Displays the alert for a few seconds
+      setTimeout(() => {
+        setFailedToSignOut(false);
+      }, 5000);
+    }
+  };
+
+  /**
+   * Handles dismissing the "failed to sign out" alert.
+   */
+  const onAlertClose = () => {
+    setFailedToSignOut(false);
+  };
 
   /**
    * Click handler for the mobile menu toggle.
@@ -21,17 +102,100 @@ export const AppHeader = () => {
   };
 
   /**
+   * Click handler for the user menu options toggle.
+   */
+  const onUserMenuOptionsToggle = (willMenuShow: boolean) => {
+    setIsUserDropdownVisible(willMenuShow);
+  };
+
+  /**
+   * Retrieves the JSX for the user profile image.
+   */
+  const getUserProfileImgJSX = () => {
+    return <img src={UserSvg} alt="user profile" width="38" />;
+  };
+
+  /**
+   * Retrieves the JSX for a logged in user in the user
+   * menu options dropdown.
+   */
+  const loggedInUserDropdownInfo = (): JSX.Element => {
+    const user = userConsumer.state.user;
+
+    if (user) {
+      const firstName = authService.titleCase(user.firstName);
+      const lastName = authService.titleCase(user.lastName);
+      const userFullName = firstName + " " + lastName;
+
+      return (
+        <Fragment>
+          <li className="mb-0 py-2 px-2 text-white">
+            Logged in as
+            <br />
+            <span className="text-secondary">
+              <strong>{userFullName}</strong>
+            </span>
+          </li>
+
+          <Dropdown.Divider className="mx-2 bg-white" />
+        </Fragment>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  /**
+   * Retrieves the JSX for a logged in user in the user
+   * menu options dropdown.
+   */
+  const loggedInUserOffCanvasInfo = (): JSX.Element => {
+    const user = userConsumer.state.user;
+    const userFirstName = authService.titleCase(user ? user.firstName : "");
+    const userLastName = authService.titleCase(user ? user.lastName : "");
+    const userFullName = userFirstName + " " + userLastName;
+
+    return (
+      <Offcanvas.Header className="mb-3 pb-2 align-items-start bg-primary text-white">
+        <Container className="p-0 me-4">
+          {getUserProfileImgJSX()}
+          <Offcanvas.Title className="mt-2">
+            {userConsumer.state.user ? "Logged in as" : "Not logged in"}
+            <br />
+            {userConsumer.state.user && (
+              <span className="text-secondary">
+                <strong>{userFullName}</strong>
+              </span>
+            )}
+          </Offcanvas.Title>
+        </Container>
+        <CloseButton
+          className="m-0 bg-light"
+          variant="white"
+          aria-label="Close navigation menu"
+          onClick={onMobileMenuToggle}
+        />
+      </Offcanvas.Header>
+    );
+  };
+
+  /**
    * Creates an offcanvas nav item.
    * @param itemLink The path to link the nav item to
    * @param itemName The name of the nav item
+   * @param itemOnClick The event handler when the item is clicked
    */
-  const createOffCanvasNavItem = (itemLink: string, itemName: string) => {
+  const createOffCanvasNavItem = (
+    itemLink: string,
+    itemName: string,
+    itemOnClick: () => void
+  ) => {
     return (
       <Nav.Item className="app-nav-item py-1 fs-5" as="li">
         <NavLink
           className="app-nav-link d-inline-block"
           to={itemLink}
-          onClick={onMobileMenuToggle}
+          onClick={itemOnClick}
         >
           {itemName}
         </NavLink>
@@ -46,7 +210,7 @@ export const AppHeader = () => {
    */
   const createNavItem = (itemLink: string, itemName: string) => {
     return (
-      <Nav.Item className="app-nav-item mx-2 d-none d-md-flex align-items-center">
+      <Nav.Item className="app-nav-item mx-3 d-none d-md-flex align-items-center">
         <NavLink className="app-nav-link fs-5" to={itemLink}>
           {itemName}
         </NavLink>
@@ -56,10 +220,9 @@ export const AppHeader = () => {
 
   return (
     <Navbar className="app-navbar py-1" bg="tertiary" expand="md">
-      <Container className="justify-content-md-center">
+      <Container className="justify-content-md-center position-relative">
         {/* Desktop Navigation */}
         <Nav>
-          {createNavItem(uiRoutes.songs, "Songs")}
           <Navbar.Brand className="mx-2 mx-md-4">
             <div className="me-0 d-flex align-items-center text-white text-decoration-none fs-3">
               <img
@@ -71,7 +234,51 @@ export const AppHeader = () => {
               <h1 className="m-0 fs-2">CE</h1>
             </div>
           </Navbar.Brand>
+          {createNavItem(uiRoutes.songs, "Songs")}
           {createNavItem(uiRoutes.favorites, "Favorites")}
+
+          <Dropdown
+            className="app-profile-dropdown ms-4 d-none d-md-flex align-items-center"
+            onToggle={onUserMenuOptionsToggle}
+            as={Nav.Item}
+          >
+            <Dropdown.Toggle
+              className="p-0 bg-transparent d-flex align-items-center rounded-circle border-0"
+              aria-expanded={isUserDropdownVisible}
+              aria-controls={desktopUserMenuId}
+            >
+              {/* Shows a loader instead of the user profile image if an auth request is processing */}
+              {userConsumer.state.authProcessing ? (
+                <Spinner className="me-1" animation="border">
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+              ) : (
+                getUserProfileImgJSX()
+              )}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu
+              className="user-dropdown-menu bg-primary p-2 overflow-hidden"
+              id={desktopUserMenuId}
+              align="start"
+              as="ul"
+            >
+              {loggedInUserDropdownInfo()}
+              <li>
+                <Button
+                  className="p-0 border-0 w-100 text-start"
+                  onClick={userConsumer.state.user ? signOutUser : signInUser}
+                >
+                  <Dropdown.Item
+                    className="dropdown-menu-item py-2 m-0 fs-5 rounded"
+                    as="h2"
+                  >
+                    {userConsumer.state.user ? "Log Out" : "Login"}
+                  </Dropdown.Item>
+                </Button>
+              </li>
+            </Dropdown.Menu>
+          </Dropdown>
         </Nav>
 
         {/* Mobile navigation */}
@@ -88,24 +295,50 @@ export const AppHeader = () => {
           show={isOffcanvasVisible}
           onHide={onMobileMenuToggle}
         >
-          <Offcanvas.Header className="justify-content-start align-items-center">
-            <button
-              className="close-menu-btn w-full d-flex align-items-center rounded"
-              onClick={onMobileMenuToggle}
-              aria-label="Close navigation menu"
-            >
-              <img src={CloseSvg} alt="x mark symbol" height={15} />
-              <h5 className="ms-2 mb-0 text-tertiary">Close</h5>
-            </button>
-          </Offcanvas.Header>
+          {loggedInUserOffCanvasInfo()}
 
-          <Offcanvas.Body>
-            <Nav onSelect={onMobileMenuToggle} as="ul">
-              {createOffCanvasNavItem(uiRoutes.songs, "Songs")}
-              {createOffCanvasNavItem(uiRoutes.favorites, "Favorites")}
-            </Nav>
+          <Offcanvas.Body className="pt-0">
+            {!userConsumer.state.authProcessing && (
+              <Nav onSelect={onMobileMenuToggle} as="ul">
+                {createOffCanvasNavItem(
+                  uiRoutes.songs,
+                  "Songs",
+                  onMobileMenuToggle
+                )}
+                {createOffCanvasNavItem(
+                  uiRoutes.favorites,
+                  "Favorites",
+                  onMobileMenuToggle
+                )}
+                {createOffCanvasNavItem(
+                  userConsumer.state.user ? "/login" : "/logout",
+                  userConsumer.state.user ? "Log Out" : "Login",
+                  userConsumer.state.user ? signOutUser : signInUser
+                )}
+              </Nav>
+            )}
+            {userConsumer.state.authProcessing && (
+              <div className="mt-3 d-flex flex-column align-items-center">
+                <Spinner animation="border">
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+                <h3 className="mt-3 text-primary">
+                  {userConsumer.state.user ? "Logging Out" : "Logging In"}
+                </h3>
+              </div>
+            )}
           </Offcanvas.Body>
         </Offcanvas>
+
+        <Alert
+          className="mt-3 mx-3 position-absolute top-100"
+          variant="danger"
+          show={failedToSignOut}
+          onClose={onAlertClose}
+        >
+          An error occurred while trying to log you out. Please try again or
+          contact us for assistance.
+        </Alert>
       </Container>
     </Navbar>
   );

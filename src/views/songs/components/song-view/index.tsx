@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { uiSearchParams } from "@components/header/uiSearchParams";
 import Button from "react-bootstrap/Button";
 import { Verse } from "@app-types/entities/verses";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { versesService } from "@services/verses";
 import Placeholder from "react-bootstrap/Placeholder";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -16,7 +16,7 @@ import { textFileService } from "@services/text-file";
 import { wordDocService } from "@services/word-doc";
 import { powerPointService } from "@services/power-point";
 import { slideshowService } from "@services/slideshow";
-import { songsService } from "@services/songs";
+import { userContext } from "@context/user";
 
 type SongViewProps = {
   book: Book | null;
@@ -28,27 +28,35 @@ export const SongView = (props: SongViewProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [loadingVerses, setLoadingVerses] = useState(false);
-  const [songIsAFavorite, setSongIsAFavorite] = useState(false);
+  const [isSongAFavorite, setIsSongAFavorite] = useState(false);
   const [updatingFavStatus, setUpdatingFavStatus] = useState(false);
   const fetchingVersesData = useRef(false);
+  const userConsumer = useContext(userContext);
 
   useEffect(() => {
-    getVerses();
+    if (props.song) {
+      getVerses();
+    }
   }, [props.song]);
 
   /**
    * Updates the song's position as a user favorite after a modification is made
-   * to its standing as a favorite song.
+   * to its standing as a favorite song or an update changes to the user.
    */
   useEffect(() => {
     if (props.song) {
-      setSongIsAFavorite(songsService.isSongAFavorite(props.song));
+      const updatedFavoriteStatus = userConsumer.methods.isSongAFavorite(
+        props.song
+      );
+
+      if (isSongAFavorite !== updatedFavoriteStatus) {
+        setIsSongAFavorite(updatedFavoriteStatus);
+      }
     }
-  }, [updatingFavStatus]);
+  }, [userConsumer.state.favoriteSongs, updatingFavStatus]);
 
   /**
-   * Retrieves the list of verses in the selected song if available and
-   * determines if the song is a user favorite.
+   * Retrieves the list of verses in the selected song if available.
    */
   const getVerses = async () => {
     if (props.song && !fetchingVersesData.current) {
@@ -67,7 +75,6 @@ export const SongView = (props: SongViewProps) => {
       setVerses(versesList);
       setLoadingVerses(false);
       fetchingVersesData.current = false;
-      setSongIsAFavorite(songsService.isSongAFavorite(props.song));
     } else {
       // Resets the list of verses when there's no selected song
       setVerses(null);
@@ -96,9 +103,9 @@ export const SongView = (props: SongViewProps) => {
   ) => {
     event.preventDefault();
 
-    if (props.song && !updatingFavStatus) {
+    if (userConsumer.state.user && props.song && !updatingFavStatus) {
       setUpdatingFavStatus(true);
-      await songsService.addFavoriteSong(props.song);
+      await userConsumer.methods.addFavoriteSong(props.song);
       setUpdatingFavStatus(false);
     }
   };
@@ -111,9 +118,9 @@ export const SongView = (props: SongViewProps) => {
   ) => {
     event.preventDefault();
 
-    if (props.song && !updatingFavStatus) {
+    if (userConsumer.state.user && props.song && !updatingFavStatus) {
       setUpdatingFavStatus(true);
-      await songsService.removeFavoriteSong(props.song);
+      await userConsumer.methods.removeFavoriteSong(props.song);
       setUpdatingFavStatus(false);
     }
   };
@@ -225,7 +232,7 @@ export const SongView = (props: SongViewProps) => {
       );
     }
 
-    // If the verses of the sond are available
+    // If the verses of the song are available
     else if (verses) {
       const song = props.song;
       const book = props.book;
@@ -250,10 +257,15 @@ export const SongView = (props: SongViewProps) => {
               <Button
                 className="mt-3 mt-md-0 me-3"
                 type="button"
-                onClick={songIsAFavorite ? removeFavoriteSong : addFavoriteSong}
-                aria-disabled={updatingFavStatus}
+                onClick={isSongAFavorite ? removeFavoriteSong : addFavoriteSong}
+                aria-disabled={!userConsumer.state.user || updatingFavStatus}
+                title={
+                  userConsumer.state.user
+                    ? ""
+                    : "Log in to add this song as a favorite"
+                }
               >
-                {songIsAFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                {isSongAFavorite ? "Remove from Favorites" : "Add to Favorites"}
               </Button>
 
               <Button

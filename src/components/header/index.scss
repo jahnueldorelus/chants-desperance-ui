@@ -1,4 +1,5 @@
 $navLinkColor: white;
+$navLinkHoverColor: var(--bs-tertiary);
 $navLinkBorderRadius: 0.4rem;
 
 @mixin navLink {
@@ -12,8 +13,6 @@ $navLinkBorderRadius: 0.4rem;
   * DESKTOP NAVIGATION STYLES
   */
   .app-nav-item {
-    $navLinkHoverColor: var(--bs-tertiary);
-
     // Navigation links
     .app-nav-link {
       @include navLink;
@@ -33,6 +32,19 @@ $navLinkBorderRadius: 0.4rem;
 
         *:hover {
           color: $newNavLinkColor;
+        }
+      }
+    }
+  }
+
+  .app-profile-dropdown {
+    .user-dropdown-menu {
+      .dropdown-menu-item {
+        color: $navLinkColor;
+
+        &:hover {
+          background-color: var(--bs-white);
+          color: $navLinkHoverColor;
         }
       }
     }

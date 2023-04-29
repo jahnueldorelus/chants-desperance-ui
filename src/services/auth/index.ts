@@ -10,60 +10,104 @@ import { apiService } from "@services/api";
 import { isAxiosError } from "axios";
 
 class AuthService {
-  private setAuthUrl: ((url: string) => void) | null;
   private csrfToken: string | null;
-  private userData: UserData | null;
 
   constructor() {
-    this.setAuthUrl = null;
     this.csrfToken = null;
-    this.userData = null;
   }
 
-  get userInfo(): UserData | null {
-    return this.userData;
+  private isUserAuthorized(): boolean {
+    return !!this.csrfToken;
   }
 
-  set authUrlMethod(arg0: (url: string) => void) {
-    this.setAuthUrl = arg0;
-  }
-
-  isUserAuthorized(): boolean {
-    return !!this.csrfToken && !!this.userData;
+  /**
+   * Resets the auth service's authentication info
+   */
+  private resetUserInfo(): void {
+    this.csrfToken = null;
   }
 
   /**
    * Attempts to authorize the user through SSO.
+   * @returns The url to authorize the user or null if an error occurred
    */
-  private async getUserAuthorized(): Promise<void> {
-    if (this.setAuthUrl) {
+  public async getUserAuthorized(): Promise<string | null> {
+    try {
+      const requestData: AuthInitiatorRequest = {
+        serviceUrl: location.href,
+      };
+      const response = await this.sendSSORequest(
+        apiService.routes.post.sso,
+        "POST",
+        requestData
+      );
+
+      if (isAxiosError(response)) {
+        throw response;
+      }
+
+      const { authUrl } = <AuthInitiatorResponse>response.data;
+
+      return authUrl;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Attempts to sign out the user through SSO.
+   */
+  public async signOutUser(): Promise<boolean> {
+    if (this.isUserAuthorized()) {
       try {
-        const requestData: AuthInitiatorRequest = {
-          serviceUrl: location.href,
-        };
         const response = await this.sendSSORequest(
-          apiService.routes.post.sso,
-          "POST",
-          requestData
+          apiService.routes.post.ssoSignOut,
+          "POST"
         );
 
         if (isAxiosError(response)) {
-          throw response;
+          throw Error();
         }
 
-        const { authUrl } = <AuthInitiatorResponse>response.data;
-
-        this.setAuthUrl(authUrl);
+        this.resetUserInfo();
+        return true;
       } catch (error) {
-        // Error will be shown in the UI through the authentication component
+        return false;
       }
+    } else {
+      return false;
     }
+  }
+
+  /**
+   * Attempts to sign in the user through SSO only if they're not
+   * signed in.
+   */
+  public async signInUser(): Promise<UserData | string | null> {
+    if (!this.isUserAuthorized()) {
+      const userData = await this.getUserToken();
+      if (!userData) {
+        return await this.getUserAuthorized();
+      }
+
+      return userData;
+    }
+    
+    return null;
+  }
+
+  public async getUserReauthorized(): Promise<UserData | null> {
+    if (!this.isUserAuthorized()) {
+      return await this.getUserToken();
+    }
+
+    return null;
   }
 
   /**
    * Attempts to retrieve a new token to validate the user's future requests.
    */
-  async getUserToken(): Promise<void> {
+  private async getUserToken(): Promise<UserData | null> {
     try {
       const response = await this.sendSSORequest(
         apiService.routes.get.ssoToken,
@@ -77,16 +121,16 @@ class AuthService {
       const result = <SSOTokenResponse>response.data;
       this.csrfToken = result.token;
 
-      await this.getUserInfo();
+      return await this.getUserInfo();
     } catch (error) {
-      await this.getUserAuthorized();
+      return null;
     }
   }
 
   /**
    * Retrieves the user's information.
    */
-  async getUserInfo(): Promise<void> {
+  public async getUserInfo(): Promise<UserData | null> {
     try {
       const requestData: UserDataRequest = {
         token: this.csrfToken || "",
@@ -101,9 +145,9 @@ class AuthService {
         throw Error();
       }
 
-      this.userData = <UserData>response.data;
+      return <UserData>response.data;
     } catch (error) {
-      // Error will be shown in the UI through the authentication component
+      return null;
     }
   }
 
@@ -113,7 +157,11 @@ class AuthService {
    * @param method The method of the API request
    * @param data The data to send along with the request
    */
-  async sendSSORequest(url: string, method: APIRequestMethod, data?: object) {
+  public async sendSSORequest(
+    url: string,
+    method: APIRequestMethod,
+    data?: object
+  ) {
     const requestData = data ? data : {};
 
     return await apiService.request(url, {
@@ -132,7 +180,14 @@ class AuthService {
    *               sent after passing SSO validation
    * @param data The data to tag along to the request
    */
-  async sendSSODataToAPI(url: string, method: APIRequestMethod, data?: object) {
+  public async sendSSODataToAPI(
+    url: string,
+    method: APIRequestMethod,
+    data?: object
+  ) {
+    // Signs in the user if they're not signed in
+    this.signInUser();
+
     // The host of this service's api server
     const apiHost =
       // @ts-ignore
@@ -169,7 +224,7 @@ class AuthService {
    * lowercased).
    * @param text The text to title case
    */
-  titleCase(text: string): string {
+  public titleCase(text: string): string {
     if (text.length === 0) {
       return "";
     } else if (text.length === 1) {

@@ -30,8 +30,8 @@ export const Slideshow = () => {
     slideshowService.toggleFullscreen();
   };
 
-  const onClose = () => {
-    slideshowService.closeFullscreen();
+  const onClose = async () => {
+   await slideshowService.closeFullscreen();
     slideshowService.closeSlideshow();
   };
 

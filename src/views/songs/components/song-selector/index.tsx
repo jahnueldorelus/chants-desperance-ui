@@ -32,6 +32,22 @@ export const SongSelector = (props: SongSelectorProps) => {
   }, [props.book]);
 
   /**
+   * Retrieves the song from the id found within the URL if present.
+   */
+  useEffect(() => {
+    if (songs && songs.length > 0) {
+      const urlSongId = searchParams.get(uiSearchParams.song) || "";
+      const tempSong = songsService.findSongById(songs, urlSongId);
+
+      if (!props.book && !tempSong) {
+        props.resetSearchParams();
+      }
+
+      props.setSelectedSong(tempSong);
+    }
+  }, [songs]);
+
+  /**
    * Retrieves the list of songs in the selected book if available.
    */
   const getSongs = async () => {
@@ -44,16 +60,6 @@ export const SongSelector = (props: SongSelectorProps) => {
         songsList = songsList.sort(
           (songOne, songTwo) => songOne.bookNum - songTwo.bookNum
         );
-
-        // Sets the selected song if a song id is found within the URL
-        const urlSongId = searchParams.get(uiSearchParams.song);
-        const tempSong = songsService.findSongById(songsList, urlSongId);
-
-        if (!props.book && !tempSong) {
-          props.resetSearchParams();
-        }
-
-        props.setSelectedSong(tempSong);
       }
 
       setSongs(songsList || []);

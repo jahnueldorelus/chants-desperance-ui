@@ -2,23 +2,23 @@ import { Book } from "@app-types/entities/books";
 import { Song } from "@app-types/entities/songs";
 import { uiSearchParams } from "@components/header/uiSearchParams";
 import { bookService } from "@services/books";
-import { songsService } from "@services/songs";
 import { SongView } from "@views/songs/components/song-view";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Container from "react-bootstrap/Container";
 import { useSearchParams } from "react-router-dom";
 import { SongsListView } from "@views/songs/components/song-selector/components/songs-list-view";
 import Placeholder from "react-bootstrap/Placeholder";
 import Col from "react-bootstrap/Col";
+import { userContext } from "@context/user";
 
 export const Favorites = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [favoriteSongs, setFavoriteSongs] = useState<Song[] | null>(null);
   const [books, setBooks] = useState<Book[] | null>(null);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [loadingData, setLoadingData] = useState(false);
   const attemptedAPIRequest = useRef<boolean>(false);
+  const userConsumer = useContext(userContext);
 
   /**
    * Retrieves the list of books and the user's favorite songs.
@@ -45,13 +45,13 @@ export const Favorites = () => {
    * Retrieves the list of the user's favorite songs.
    */
   const getFavoriteSongs = async () => {
-    const songsList = await songsService.getAllFavoriteSongs();
-    setFavoriteSongs(songsList);
+    await userConsumer.methods.getFavoriteSongs();
+    const songsList = userConsumer.state.favoriteSongs;
 
     // Sets the selected song if a song id is found within the URL
     if (songsList) {
-      const urlSongId = searchParams.get(uiSearchParams.song);
-      const tempSong = songsService.findSongById(songsList, urlSongId);
+      const urlSongId = searchParams.get(uiSearchParams.song) || "";
+      const tempSong = userConsumer.methods.getFavoriteSongById(urlSongId);
 
       if (!tempSong) {
         resetSearchParams();
@@ -117,10 +117,10 @@ export const Favorites = () => {
    * The JSX of the user's favorite songs.
    */
   const favoriteSongsListJSX = () => {
-    if (books && favoriteSongs && favoriteSongs.length > 0) {
+    if (books && userConsumer.state.favoriteSongs.size > 0) {
       return (
         <SongsListView
-          songs={favoriteSongs}
+          songs={[...userConsumer.state.favoriteSongs.values()]}
           books={books}
           onSongClick={onSongClick}
         />

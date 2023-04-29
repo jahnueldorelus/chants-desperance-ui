@@ -1,71 +1,85 @@
-import { authService } from "@services/auth";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
 import Button from "react-bootstrap/Button";
+import { userContext } from "@context/user";
+import { useNavigate } from "react-router-dom";
+import { uiRoutes } from "@components/header/uiRoutes";
 
 type AuthenticationProps = {
   children: JSX.Element;
 };
 
 export const Authentication = (props: AuthenticationProps) => {
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [authUrl, setAuthUrl] = useState<string | null>(null);
+  const navigate = useNavigate();
   const attemptedAuthRequest = useRef<boolean>(false);
-  const [authProcessing, setAuthProcessing] = useState<boolean>(false);
+  const userConsumer = useContext(userContext);
 
   useEffect(() => {
-    /**
-     * Saves the state changer function to the service to change
-     * the state outside of the component
-     */
-    authService.authUrlMethod = setAuthUrl;
-
     if (!attemptedAuthRequest.current) {
-      attemptedAuthRequest.current = true;
-      getUserAuthenticated();
+      if (!userConsumer.state.user) {
+        attemptedAuthRequest.current = true;
+        getUserAuthenticated();
+      } else {
+        /**
+         * An initial request doesn't need to be made as the user
+         * is already available
+         */
+        attemptedAuthRequest.current = true;
+      }
     }
-  }, []);
-
-  // Navigates to the auth url if a url is present
-  useEffect(() => {
-    if (authUrl) {
-      window.location.replace(authUrl);
-    }
-  }, [authUrl]);
+  }, [userConsumer.state.user]);
 
   /**
    * Attempts to authenticate the user.
    */
-  const getUserAuthenticated = async () => {
-    setAuthProcessing(true);
-    if (!authService.isUserAuthorized()) {
-      await authService.getUserToken();
+  const getUserAuthenticated = async (
+    event?: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    if (event) {
+      event.preventDefault();
     }
 
-    setAuthProcessing(false);
-    setIsAuthorized(authService.isUserAuthorized());
+    await userConsumer.methods.signInUser();
+  };
+
+  /**
+   * Navigates to the home page.
+   */
+  const goHome = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (event) {
+      event.preventDefault();
+    }
+
+    navigate(uiRoutes.songs);
   };
 
   // If the user is authorized
-  if (isAuthorized) {
+  if (userConsumer.state.user) {
     return props.children;
   }
 
   // If an attempt is in progress to authorize the user
-  else if (authProcessing || authUrl) {
+  else if (userConsumer.state.authProcessing) {
     return (
       <Container className="py-5 d-flex flex-column align-items-center text-center">
         <Spinner
           className="mt-5"
-          animation="grow"
+          animation="border"
           role="status"
           variant="primary"
-          style={{ height: 70, width: 70 }}
+          style={{ height: 85, width: 85, borderWidth: 9 }}
         >
           <span className="visually-hidden">Loading...</span>
         </Spinner>
-        <h1 className="pt-4 text-tertiary">Signing in, please wait a moment</h1>
+        <div>
+          <p className="px-3 mt-5 fs-4 mb-0 bg-primary text-white rounded">
+            Signing in
+          </p>
+          <p className="mt-3 fs-2 fw-bold text-tertiary">
+            Please wait a moment
+          </p>
+        </div>
       </Container>
     );
   }
@@ -76,11 +90,9 @@ export const Authentication = (props: AuthenticationProps) => {
       <Container className="px-3 py-5">
         <Container className="mt-3 px-0 w-fit text-primary border rounded overflow-hidden text-center">
           <div className="px-3 py-2 bg-primary">
-            <h3 className="m-0 text-secondary">
-              Uh-oh, looks like we couldn't log you in.
-            </h3>
+            <h3 className="m-0 text-white">Authentication Required</h3>
           </div>
-          <div className="px-3">
+          <div className="px-3 text-tertiary">
             {/* If cookies are disabled */}
             {!navigator.cookieEnabled && (
               <p className="mt-3">
@@ -89,27 +101,26 @@ export const Authentication = (props: AuthenticationProps) => {
               </p>
             )}
 
-            <h5 className="mt-4">
-              If you'd like to retry logging in, click the button below.
+            <h5 className="mt-4 fw-bold">
+              In order to view this page, you'll have to be logged in.
             </h5>
-            <Button
-              className="mt-1"
-              type="button"
-              onClick={getUserAuthenticated}
-            >
-              Retry Login
-            </Button>
+            <h5 className="fw-normal">
+              Click below to log into your account or go back home.
+            </h5>
 
-            <h6 className="mt-4">
-              If the issue persists, please contact us&nbsp;
-              <a
-                className="text-tertiary"
-                href="mailto:support@jahnueldorelus.com?subject=Service - Chant d'Espérance: Unable to Login"
+            <div className="my-4 d-flex justify-content-evenly align-items-center">
+              <Button className="mx-3 w-100" type="button" onClick={goHome}>
+                Go Home
+              </Button>
+
+              <Button
+                className="mx-3 w-100"
+                type="button"
+                onClick={getUserAuthenticated}
               >
-                here
-              </a>
-              .
-            </h6>
+                Login
+              </Button>
+            </div>
           </div>
         </Container>
       </Container>

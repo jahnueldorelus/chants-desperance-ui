@@ -52,6 +52,7 @@ class APIService {
         sso: this.baseAuthSSOPath + "/sso",
         ssoUser: this.baseAuthSSOPath + "/sso-user",
         ssoDataToApi: this.baseAuthSSOPath + "/sso-data",
+        ssoSignOut: this.baseAuthSSOPath + "/sign-out"
       },
     };
   }

@@ -162,8 +162,8 @@ class SlideshowService {
   /**
    * Exits fullscreen mode for the browser.
    */
-  closeFullscreen() {
-    screenService.exitFullscreen();
+  async closeFullscreen() {
+    await screenService.exitFullscreen();
   }
 
   /**

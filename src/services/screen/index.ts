@@ -37,6 +37,7 @@ class ScreenService {
    * Sends an enter fullscreen request to the browser.
    */
   enterFullscreen() {
+    if (!this.isDocInFullscreenMode()) {
     const docElement = <BrowserDocumentElement>document.documentElement;
 
     // Enters fullscreen mode based upon the browsers fullscreen method
@@ -50,18 +51,19 @@ class ScreenService {
       docElement.requestFullScreen();
     } else if (docElement.mozRequestFullScreen) {
       docElement.mozRequestFullScreen();
-    }
+    }}
   }
 
   /**
    * Sends an exit fullscreen request to the browser.
    */
-  exitFullscreen() {
+  async exitFullscreen() {
+    if (this.isDocInFullscreenMode()) {
     const doc = <BrowserDocument>document;
 
     // Exits fullscreen mode
     if (doc.exitFullscreen) {
-      doc.exitFullscreen();
+     await doc.exitFullscreen();
     } else if (doc.webkitExitFullscreen) {
       doc.webkitExitFullscreen();
     } else if (doc.msExitFullscreen) {
@@ -71,6 +73,7 @@ class ScreenService {
     } else if (doc.mozCancelFullScreen) {
       doc.mozCancelFullScreen();
     }
+  }
   }
 
   /**

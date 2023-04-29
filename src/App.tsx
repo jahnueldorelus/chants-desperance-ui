@@ -1,9 +1,10 @@
 import { AppHeader } from "@components/header";
 import { Outlet, useLocation } from "react-router-dom";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppFooter } from "@components/footer";
 import { appContentHeightService } from "@services/app-content-height";
 import "./App.scss";
+import { UserProvider } from "@context/user";
 
 function App() {
   const location = useLocation();
@@ -63,7 +64,7 @@ function App() {
   }, []);
 
   return (
-    <Fragment>
+    <UserProvider>
       <header ref={headerRef}>
         <AppHeader />
       </header>
@@ -75,7 +76,7 @@ function App() {
       <footer ref={footerRef}>
         <AppFooter />
       </footer>
-    </Fragment>
+    </UserProvider>
   );
 }
 

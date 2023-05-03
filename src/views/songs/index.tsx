@@ -15,44 +15,51 @@ export const Songs = () => {
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [books, setBooks] = useState<Book[] | null>(null);
   const loadingBooks = useRef(true);
+  const attemptedAPIRequest = useRef(false);
 
   /**
    * Retrieves the list of books and sets the selected book if
    * available within the URL.
    */
   useEffect(() => {
-    const getBooks = async () => {
-      let booksList = await bookService.getAllBooks();
+    if (!attemptedAPIRequest.current) {
+      attemptedAPIRequest.current = true;
+      getBooks();
+    }
+  }, []);
 
-      if (booksList) {
-        // Sorts books by name
-        booksList = booksList.sort((bookOne, bookTwo) => {
-          if (bookOne.name > bookTwo.name) {
-            return 1;
-          } else if (bookOne.name < bookTwo.name) {
-            return -1;
-          } else {
-            return 0;
-          }
-        });
+  /**
+   * Retrieves the list of books.
+   */
+  const getBooks = async () => {
+    let booksList = await bookService.getAllBooks();
 
-        // Sets the selected book if a book id is found within the URL
-        const urlBookId = searchParams.get(uiSearchParams.book);
-        const tempBook = bookService.findBookById(booksList, urlBookId);
-
-        if (!tempBook) {
-          resetSearchParams();
+    if (booksList) {
+      // Sorts books by name
+      booksList = booksList.sort((bookOne, bookTwo) => {
+        if (bookOne.name > bookTwo.name) {
+          return 1;
+        } else if (bookOne.name < bookTwo.name) {
+          return -1;
+        } else {
+          return 0;
         }
+      });
 
-        setSelectedBook(tempBook);
+      // Sets the selected book if a book id is found within the URL
+      const urlBookId = searchParams.get(uiSearchParams.book);
+      const tempBook = bookService.findBookById(booksList, urlBookId);
+
+      if (!tempBook) {
+        resetSearchParams();
       }
 
-      setBooks(booksList || []);
-      loadingBooks.current = false;
-    };
+      setSelectedBook(tempBook);
+    }
 
-    getBooks();
-  }, []);
+    setBooks(booksList || []);
+    loadingBooks.current = false;
+  };
 
   /**
    * Removes the book and song id from the url if they're there.

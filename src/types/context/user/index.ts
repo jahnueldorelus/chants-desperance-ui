@@ -15,7 +15,7 @@ export type UserState = {
     addFavoriteSong: (song: Song) => Promise<void>;
     removeFavoriteSong: (song: Song) => Promise<void>;
     getFavoriteSongById: (songId: string) => Song | null;
-    signInUser: () => Promise<void>;
+    signInUser: () => Promise<boolean>;
     signOutUser: () => Promise<boolean>;
     reauthorizeUser: () => Promise<void>;
   };

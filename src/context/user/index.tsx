@@ -16,7 +16,7 @@ const UserProvider = (props: UserProviderProps) => {
   const [ssoAuthUrl, setSSOAuthUrl] = useState<string | null>(null);
 
   // Determines if an authentication request is processing
-  const [authProcessing, setAuthProcessing] = useState<boolean>(false);
+  const [authReqProcessing, setAuthReqProcessing] = useState<boolean>(false);
 
   // A map of the user's favorite songs
   const [favoriteSongs, setFavoriteSongs] = useState<Map<string, Song>>(
@@ -116,22 +116,26 @@ const UserProvider = (props: UserProviderProps) => {
    * Attempts to sign in the user.
    */
   const signInUser = async () => {
-    setAuthProcessing(true);
+    if (!authReqProcessing && !user) {
+      setAuthReqProcessing(true);
 
-    const response = await authService.signInUser();
+      const userDataOrAuthUrl = await authService.signInUser();
 
-    // If the response is the SSO authentication url
-    if (typeof response === "string") {
-      setSSOAuthUrl(response);
+      // If the response is the SSO authentication url
+      if (typeof userDataOrAuthUrl === "string") {
+        setSSOAuthUrl(userDataOrAuthUrl);
+      }
+      // The response is the user's data
+      else {
+        setUser(userDataOrAuthUrl);
+        setAuthReqProcessing(false);
+      }
 
-      /**
-       * 
-       */
-    }
-    // The response is the user's data
-    else {
-      setUser(response);
-      setAuthProcessing(false);
+      return true;
+    } else if (user) {
+      return true;
+    } else {
+      return false;
     }
   };
 
@@ -139,24 +143,29 @@ const UserProvider = (props: UserProviderProps) => {
    * Attempts to sign out the user.
    */
   const signOutUser = async () => {
-    setAuthProcessing(true);
+    setAuthReqProcessing(true);
 
-    const signedOutUser = await authService.signOutUser();
+    const signOutAuthUrl = await authService.signOutUser();
 
-    if (signedOutUser) {
+    if (signOutAuthUrl) {
       setUser(null);
+      location.replace(signOutAuthUrl);
     }
 
-    setAuthProcessing(false);
-    return signedOutUser ? true : false;
+    setAuthReqProcessing(false);
+    return signOutAuthUrl ? true : false;
   };
 
   /**
    * Attempts to reauthenticate the user.
    */
   const reauthorizeUser = async () => {
+    setAuthReqProcessing(true);
+
     const userData = await authService.getUserReauthorized();
+
     setUser(userData);
+    setAuthReqProcessing(false);
   };
 
   const providerValue: UserState = {
@@ -164,7 +173,7 @@ const UserProvider = (props: UserProviderProps) => {
       user,
       favoriteSongs,
       ssoAuthUrl,
-      authProcessing,
+      authProcessing: authReqProcessing,
     },
     methods: {
       setUser,

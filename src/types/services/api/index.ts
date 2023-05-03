@@ -26,7 +26,7 @@ export type APIRoute = {
     sso: string;
     ssoUser: string;
     ssoDataToApi: string;
-    ssoSignOut: string;
+    ssoSignOutAuthRedirect: string;
   };
 };
 

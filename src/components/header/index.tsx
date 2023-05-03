@@ -61,7 +61,6 @@ export const AppHeader = () => {
     }
 
     await userConsumer.methods.signInUser();
-    // setIsOffcanvasVisible(false);
   };
 
   /**
@@ -75,7 +74,6 @@ export const AppHeader = () => {
     }
 
     const userSignedOut = await userConsumer.methods.signOutUser();
-    // setIsOffcanvasVisible(false);
 
     if (!userSignedOut) {
       setFailedToSignOut(true);
@@ -258,7 +256,10 @@ export const AppHeader = () => {
             </Dropdown.Toggle>
 
             <Dropdown.Menu
-              className="user-dropdown-menu bg-primary p-2 overflow-hidden"
+              className={
+                "user-dropdown-menu bg-primary p-2 overflow-hidden" +
+                (userConsumer.state.authProcessing ? " d-none" : "")
+              }
               id={desktopUserMenuId}
               align="start"
               as="ul"

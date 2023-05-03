@@ -57,12 +57,15 @@ class AuthService {
   /**
    * Attempts to sign out the user through SSO.
    */
-  public async signOutUser(): Promise<boolean> {
+  public async signOutUser(): Promise<string | null> {
     if (this.isUserAuthorized()) {
+      const requestData = { serviceUrl: location.href };
+
       try {
         const response = await this.sendSSORequest(
-          apiService.routes.post.ssoSignOut,
-          "POST"
+          apiService.routes.post.ssoSignOutAuthRedirect,
+          "POST",
+          requestData
         );
 
         if (isAxiosError(response)) {
@@ -70,12 +73,12 @@ class AuthService {
         }
 
         this.resetUserInfo();
-        return true;
+        return <string>response.data;
       } catch (error) {
-        return false;
+        return null;
       }
     } else {
-      return false;
+      return null;
     }
   }
 
@@ -86,13 +89,14 @@ class AuthService {
   public async signInUser(): Promise<UserData | string | null> {
     if (!this.isUserAuthorized()) {
       const userData = await this.getUserToken();
+
       if (!userData) {
         return await this.getUserAuthorized();
       }
 
       return userData;
     }
-    
+
     return null;
   }
 

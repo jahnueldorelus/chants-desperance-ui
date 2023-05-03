@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext } from "react";
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
 import Button from "react-bootstrap/Button";
@@ -12,23 +12,7 @@ type AuthenticationProps = {
 
 export const Authentication = (props: AuthenticationProps) => {
   const navigate = useNavigate();
-  const attemptedAuthRequest = useRef<boolean>(false);
   const userConsumer = useContext(userContext);
-
-  useEffect(() => {
-    if (!attemptedAuthRequest.current) {
-      if (!userConsumer.state.user) {
-        attemptedAuthRequest.current = true;
-        getUserAuthenticated();
-      } else {
-        /**
-         * An initial request doesn't need to be made as the user
-         * is already available
-         */
-        attemptedAuthRequest.current = true;
-      }
-    }
-  }, [userConsumer.state.user]);
 
   /**
    * Attempts to authenticate the user.

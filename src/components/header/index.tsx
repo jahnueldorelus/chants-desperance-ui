@@ -12,7 +12,6 @@ import { NavLink } from "react-router-dom";
 import { uiRoutes } from "@components/header/uiRoutes";
 import CELogo from "@assets/chants-desperance.png";
 import UserSvg from "@assets/user.svg";
-import { authService } from "@services/auth";
 import { userContext } from "@context/user";
 import "./index.scss";
 
@@ -121,9 +120,7 @@ export const AppHeader = () => {
     const user = userConsumer.state.user;
 
     if (user) {
-      const firstName = authService.titleCase(user.firstName);
-      const lastName = authService.titleCase(user.lastName);
-      const userFullName = firstName + " " + lastName;
+      const userFullName = userConsumer.methods.getUserFullName(user);
 
       return (
         <Fragment>
@@ -149,9 +146,7 @@ export const AppHeader = () => {
    */
   const loggedInUserOffCanvasInfo = (): JSX.Element => {
     const user = userConsumer.state.user;
-    const userFirstName = authService.titleCase(user ? user.firstName : "");
-    const userLastName = authService.titleCase(user ? user.lastName : "");
-    const userFullName = userFirstName + " " + userLastName;
+    const userFullName = userConsumer.methods.getUserFullName(user);
 
     return (
       <Offcanvas.Header className="mb-3 pb-2 align-items-start bg-primary text-white">

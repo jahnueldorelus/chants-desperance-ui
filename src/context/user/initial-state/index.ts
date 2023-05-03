@@ -26,5 +26,7 @@ export const initialUserContextState: UserConsumer = {
     signOutUser: async () => false,
 
     reauthorizeUser: async () => {},
+
+    getUserFullName: (arg0) => "",
   },
 };

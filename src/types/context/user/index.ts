@@ -18,6 +18,7 @@ export type UserMethods = {
   signInUser: () => Promise<boolean>;
   signOutUser: () => Promise<boolean>;
   reauthorizeUser: () => Promise<void>;
+  getUserFullName: (user: UserData | null) => string;
 };
 
 export type UserConsumer = {

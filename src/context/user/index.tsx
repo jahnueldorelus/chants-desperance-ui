@@ -169,6 +169,24 @@ const UserProvider = (props: UserProviderProps) => {
     setAuthReqProcessing(false);
   };
 
+  /**
+   * Retrieves the full name of a user in titlecase form.
+   * @returns The user's full name in title case form or an empty
+   *          string if no user was given
+   */
+  const getUserFullName = (user: UserData | null): string => {
+    if (user) {
+      return (user.firstName + " " + user.lastName).replace(
+        /\w\S*/g,
+        (word) =>
+          word.charAt(0).toLocaleUpperCase() +
+          word.substring(1).toLocaleLowerCase()
+      );
+    }
+
+    return "";
+  };
+
   const providerValue: UserConsumer = {
     state: {
       user,
@@ -186,6 +204,7 @@ const UserProvider = (props: UserProviderProps) => {
       signInUser,
       signOutUser,
       reauthorizeUser,
+      getUserFullName,
     },
   };
 

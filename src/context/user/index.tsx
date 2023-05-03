@@ -1,11 +1,12 @@
-import { UserProviderProps, UserState } from "@app-types/context/user";
+import { UserProviderProps, UserConsumer } from "@app-types/context/user";
 import { Song } from "@app-types/entities/songs";
 import { UserData } from "@app-types/services/auth";
 import { authService } from "@services/auth";
 import { songsService } from "@services/songs";
 import { createContext, useEffect, useState } from "react";
+import { initialUserContextState } from "./initial-state";
 
-const context = createContext({} as UserState); // Context initial state will be changed in provider
+const context = createContext(initialUserContextState);
 const { Provider } = context;
 
 const UserProvider = (props: UserProviderProps) => {
@@ -168,7 +169,7 @@ const UserProvider = (props: UserProviderProps) => {
     setAuthReqProcessing(false);
   };
 
-  const providerValue: UserState = {
+  const providerValue: UserConsumer = {
     state: {
       user,
       favoriteSongs,

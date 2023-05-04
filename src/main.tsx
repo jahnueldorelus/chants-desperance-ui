@@ -22,7 +22,7 @@ const router = createBrowserRouter([
       {
         path: uiRoutes.favorites,
         element: (
-          <Authentication>
+          <Authentication pageName="your favorite songs">
             <Favorites />
           </Authentication>
         ),

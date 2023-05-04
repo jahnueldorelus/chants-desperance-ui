@@ -228,7 +228,8 @@ export const AppHeader = () => {
             </div>
           </Navbar.Brand>
           {createNavItem(uiRoutes.songs, "Songs")}
-          {createNavItem(uiRoutes.favorites, "Favorites")}
+          {userConsumer.state.user &&
+            createNavItem(uiRoutes.favorites, "Favorites")}
 
           <Dropdown
             className="app-profile-dropdown ms-4 d-none d-md-flex align-items-center"
@@ -301,11 +302,12 @@ export const AppHeader = () => {
                   "Songs",
                   onMobileMenuToggle
                 )}
-                {createOffCanvasNavItem(
-                  uiRoutes.favorites,
-                  "Favorites",
-                  onMobileMenuToggle
-                )}
+                {userConsumer.state.user &&
+                  createOffCanvasNavItem(
+                    uiRoutes.favorites,
+                    "Favorites",
+                    onMobileMenuToggle
+                  )}
                 {createOffCanvasNavItem(
                   userConsumer.state.user ? "/login" : "/logout",
                   userConsumer.state.user ? "Log Out" : "Login",

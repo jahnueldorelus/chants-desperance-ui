@@ -8,6 +8,7 @@ import { uiRoutes } from "@components/header/uiRoutes";
 
 type AuthenticationProps = {
   children: JSX.Element;
+  pageName?: string;
 };
 
 export const Authentication = (props: AuthenticationProps) => {
@@ -86,7 +87,8 @@ export const Authentication = (props: AuthenticationProps) => {
             )}
 
             <h5 className="mt-4 fw-bold">
-              In order to view this page, you'll have to be logged in.
+              In order to view {props.pageName || "this page"}, you'll have to
+              be logged in.
             </h5>
             <h5 className="fw-normal">
               Click below to log into your account or go back home.

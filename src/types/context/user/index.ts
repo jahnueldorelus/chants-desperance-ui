@@ -11,9 +11,9 @@ export type UserState = {
 export type UserMethods = {
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
   isSongAFavorite: (song: Song) => boolean;
-  getFavoriteSongs: () => Promise<void>;
-  addFavoriteSong: (song: Song) => Promise<void>;
-  removeFavoriteSong: (song: Song) => Promise<void>;
+  getFavoriteSongs: () => Promise<boolean>;
+  addFavoriteSong: (song: Song) => Promise<boolean>;
+  removeFavoriteSong: (song: Song) => Promise<boolean>;
   getFavoriteSongById: (songId: string) => Song | null;
   signInUser: () => Promise<boolean>;
   signOutUser: () => Promise<boolean>;

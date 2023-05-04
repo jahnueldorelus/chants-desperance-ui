@@ -1,22 +1,16 @@
 import { Book } from "@app-types/entities/books";
 import { Song } from "@app-types/entities/songs";
-import { bookService } from "@services/books";
-import Badge from "react-bootstrap/Badge";
 import { useSearchParams } from "react-router-dom";
 import { uiSearchParams } from "@components/header/uiSearchParams";
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 import { Verse } from "@app-types/entities/verses";
 import { useContext, useEffect, useRef, useState } from "react";
 import { versesService } from "@services/verses";
-import Placeholder from "react-bootstrap/Placeholder";
-import Dropdown from "react-bootstrap/Dropdown";
-import Col from "react-bootstrap/Col";
-import { emailService } from "@services/email";
-import { textFileService } from "@services/text-file";
-import { wordDocService } from "@services/word-doc";
-import { powerPointService } from "@services/power-point";
-import { slideshowService } from "@services/slideshow";
 import { userContext } from "@context/user";
+import { SongViewHeader } from "./components/header";
+import { SongViewLoader } from "./components/loader";
+import { SongViewBody } from "./components/body";
 
 type SongViewProps = {
   book: Book | null;
@@ -28,32 +22,47 @@ export const SongView = (props: SongViewProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [loadingVerses, setLoadingVerses] = useState(false);
-  const [isSongAFavorite, setIsSongAFavorite] = useState(false);
-  const [updatingFavStatus, setUpdatingFavStatus] = useState(false);
+  const [showFavUpdateFailAlert, setShowFavUpdateFailAlert] = useState(false);
   const fetchingVersesData = useRef(false);
+  const alertTimeout = useRef<NodeJS.Timeout>();
   const userConsumer = useContext(userContext);
 
+  /**
+   * Retrieves the list of verses of a song whenever a new song
+   * is given. Also, if there's no longer a song available, the component
+   * is cleaned up.
+   */
   useEffect(() => {
     if (props.song) {
       getVerses();
+    } else {
+      resetFavoriteUpdateFailAlert();
     }
   }, [props.song]);
 
   /**
-   * Updates the song's position as a user favorite after a modification is made
-   * to its standing as a favorite song or an update changes to the user.
+   * Handles showing an alert to the user that updating the song's
+   * status as a favorite failed.
    */
   useEffect(() => {
-    if (props.song) {
-      const updatedFavoriteStatus = userConsumer.methods.isSongAFavorite(
-        props.song
-      );
-
-      if (isSongAFavorite !== updatedFavoriteStatus) {
-        setIsSongAFavorite(updatedFavoriteStatus);
-      }
+    if (showFavUpdateFailAlert) {
+      alertTimeout.current = setTimeout(() => {
+        resetFavoriteUpdateFailAlert();
+      }, 4000);
     }
-  }, [userConsumer.state.favoriteSongs, updatingFavStatus]);
+
+    return () => {
+      clearTimeout(alertTimeout.current);
+    };
+  }, [showFavUpdateFailAlert]);
+
+  /**
+   * Resets the alert for a failed song modification as a favorite.
+   */
+  const resetFavoriteUpdateFailAlert = () => {
+    clearTimeout(alertTimeout.current);
+    setShowFavUpdateFailAlert(false);
+  };
 
   /**
    * Retrieves the list of verses in the selected song if available.
@@ -95,237 +104,41 @@ export const SongView = (props: SongViewProps) => {
     props.setSelectedSong(null);
   };
 
-  /**
-   * Adds a song to the user's list of favorites.
-   */
-  const addFavoriteSong = async (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-
-    if (userConsumer.state.user && props.song && !updatingFavStatus) {
-      setUpdatingFavStatus(true);
-      await userConsumer.methods.addFavoriteSong(props.song);
-      setUpdatingFavStatus(false);
-    }
-  };
-
-  /**
-   * Removes a song from the user's list of favorites.
-   */
-  const removeFavoriteSong = async (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-
-    if (userConsumer.state.user && props.song && !updatingFavStatus) {
-      setUpdatingFavStatus(true);
-      await userConsumer.methods.removeFavoriteSong(props.song);
-      setUpdatingFavStatus(false);
-    }
-  };
-
-  /**
-   * Sends an email of the selected song using the user's mail client.
-   */
-  const onSendEmailClick = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-
-    if (props.book && props.song && verses) {
-      emailService.createTextFileFromSong(props.book, props.song, verses);
-    }
-  };
-
-  /**
-   * Downloads a text file of the song.
-   */
-  const onDownloadTextClick = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-    if (props.book && props.song && verses) {
-      textFileService.createTextFileFromSong(props.book, props.song, verses);
-    }
-  };
-
-  /**
-   * Downloads the song as a word document.
-   */
-  const onDownloadWordClick = async (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-
-    if (props.book && props.song && verses) {
-      await wordDocService.createWordDocumentFromSong(
-        props.book,
-        props.song,
-        verses
-      );
-    }
-  };
-
-  /**
-   * Downloads the song as a powerpoint.
-   */
-  const onDownloadPowerPointClick = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-
-    if (props.book && props.song && verses) {
-      powerPointService.createPowerPointFromSong(
-        props.book,
-        props.song,
-        verses
-      );
-    }
-  };
-
-  /**
-   * Presents the song in a slideshow.
-   */
-  const openSlideshow = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    event.preventDefault();
-
-    if (props.song && verses) {
-      slideshowService.loadSongIntoSlideshow(verses, props.song);
-      slideshowService.openSlideshow();
-    }
-  };
-
   // If the verses of the song are loading
   if (props.book && props.song) {
-    if (loadingVerses) {
-      return (
-        <div>
-          <Button type="button" onClick={onClickGoBack}>
-            Go Back
-          </Button>
+    const isSongAFavorite = userConsumer.methods.isSongAFavorite(props.song);
 
-          <Col className="mt-3" xs={4}>
-            <div className="py-3 mb-3">
-              <div>
-                <Placeholder animation="glow">
-                  <Placeholder xs={12} />
-                  <Placeholder className="d-block" xs={4} />
-                  <Placeholder className="mt-3 d-block" xs={6} />
-                </Placeholder>
-              </div>
-            </div>
-          </Col>
+    return (
+      <div>
+        <Button type="button" onClick={onClickGoBack}>
+          Go Back
+        </Button>
 
-          <Col className="mt-3" md={5}>
-            <div className="px-3 py-3 border rounded">
-              {[1, 2, 3].map((num) => (
-                <Placeholder animation="glow" key={num}>
-                  <Placeholder xs={12} />
-                  <Placeholder className="d-block" xs={5} />
-                  <Placeholder className="mt-1 mb-2 d-block" xs={8} />
-                </Placeholder>
-              ))}
-            </div>
-          </Col>
-        </div>
-      );
-    }
+        <Alert
+          className="px-3 py-2 mt-4 d-flex w-fit"
+          show={showFavUpdateFailAlert}
+          variant="danger"
+        >
+          <p className="m-0">{`An error occurred ${
+            isSongAFavorite ? "removing" : "adding"
+          } the song as a favorite`}</p>
+        </Alert>
 
-    // If the verses of the song are available
-    else if (verses) {
-      const song = props.song;
-      const book = props.book;
+        <SongViewLoader show={loadingVerses} />
 
-      return (
-        <div>
-          <Button type="button" onClick={onClickGoBack}>
-            Go Back
-          </Button>
+        <SongViewHeader
+          book={props.book}
+          song={props.song}
+          verses={verses}
+          show={!loadingVerses && !!verses}
+          resetFavoriteUpdateFailAlert={resetFavoriteUpdateFailAlert}
+          setShowFavUpdateFailAlert={setShowFavUpdateFailAlert}
+        />
 
-          <div className="mt-4 d-flex flex-wrap justify-content-between align-items-center">
-            <div className="d-flex align-items-center">
-              <h2 className="mb-0 text-tertiary">{book.name}</h2>
-              <h4 className="mb-0">
-                <Badge className="ms-3" bg="tertiary">
-                  {bookService.getBookLanguage(book)}
-                </Badge>
-              </h4>
-            </div>
-
-            <div>
-              <Button
-                className="mt-3 mt-md-0 me-3"
-                type="button"
-                onClick={isSongAFavorite ? removeFavoriteSong : addFavoriteSong}
-                aria-disabled={!userConsumer.state.user || updatingFavStatus}
-                title={
-                  userConsumer.state.user
-                    ? ""
-                    : "Log in to add this song as a favorite"
-                }
-              >
-                {isSongAFavorite ? "Remove from Favorites" : "Add to Favorites"}
-              </Button>
-
-              <Button
-                className="mt-3 mt-md-0 me-3"
-                type="button"
-                onClick={onSendEmailClick}
-              >
-                Email
-              </Button>
-              <Dropdown className="d-inline-block">
-                <Dropdown.Toggle
-                  className="mt-3 mt-md-0 me-3"
-                  variant="primary"
-                >
-                  Download
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={onDownloadTextClick}>
-                    Text
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={onDownloadWordClick}>
-                    Word
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={onDownloadPowerPointClick}>
-                    PowerPoint
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-              <Button
-                className="mt-3 mt-md-0"
-                type="button"
-                onClick={openSlideshow}
-              >
-                Present
-              </Button>
-            </div>
-          </div>
-
-          <div className="mt-4 border rounded overflow-hidden">
-            <div className="px-3 py-3 bg-primary text-secondary">
-              <h5 className="mb-0">
-                #{song.bookNum}&nbsp;{song.name}
-              </h5>
-            </div>
-
-            <div className="px-3 pb-4 text-center">
-              {verses.map((item) => (
-                <div className="mt-4" key={item._id}>
-                  <h6>{versesService.getVerseNumber(item, song)}</h6>
-                  {item.verse.split("\n").map((verse, index) => (
-                    <h6 key={index}>{verse}</h6>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      );
-    }
+        <SongViewBody song={props.song} verses={verses} show={!loadingVerses} />
+      </div>
+    );
+  } else {
+    return <></>;
   }
-
-  return <></>;
 };

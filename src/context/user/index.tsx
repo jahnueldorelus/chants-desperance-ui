@@ -29,42 +29,16 @@ const UserProvider = (props: UserProviderProps) => {
    */
   useEffect(() => {
     if (user) {
-      getUserFavoriteSongs();
+      getFavoriteSongs();
     }
   }, [user]);
-
-  /**
-   * Retrieves the user's favorite songs.
-   */
-  const getUserFavoriteSongs = async () => {
-    const favoriteSongsList = await songsService.getAllFavoriteSongs();
-
-    if (favoriteSongsList) {
-      const newFavoriteSongsSet: Map<string, Song> = new Map();
-      favoriteSongsList.forEach((song) =>
-        newFavoriteSongsSet.set(song._id, song)
-      );
-
-      setFavoriteSongs(newFavoriteSongsSet);
-    }
-  };
 
   /**
    * Determines if a song is one of the user's favorite songs.
    * @param song The song to determine if it's a favorite
    */
   const isSongAFavorite = (song: Song) => {
-    /**
-     * If the user is signed in, a check is made to see if the song is
-     * a favorite. Otherwise, false is returned by and the list of
-     * favorite songs is cleared if it's populated
-     */
-    if (user) {
-      return favoriteSongs.has(song._id);
-    } else {
-      setFavoriteSongs(new Map());
-      return false;
-    }
+    return favoriteSongs.has(song._id);
   };
 
   /**
@@ -72,11 +46,17 @@ const UserProvider = (props: UserProviderProps) => {
    */
   const getFavoriteSongs = async () => {
     const songs = await songsService.getAllFavoriteSongs();
-    const tempFavoriteSongs: Map<string, Song> = new Map();
 
     if (songs) {
+      const tempFavoriteSongs: Map<string, Song> = new Map();
       songs.forEach((song) => tempFavoriteSongs.set(song._id, song));
       setFavoriteSongs(tempFavoriteSongs);
+
+      return true;
+    } else {
+      setFavoriteSongs(new Map());
+
+      return false;
     }
   };
 
@@ -89,7 +69,10 @@ const UserProvider = (props: UserProviderProps) => {
 
     if (songWasAdded) {
       setFavoriteSongs(favoriteSongs.set(song._id, song));
+      return true;
     }
+
+    return false;
   };
 
   /**
@@ -101,9 +84,11 @@ const UserProvider = (props: UserProviderProps) => {
 
     if (songWasRemoved) {
       favoriteSongs.delete(song._id);
-
       setFavoriteSongs(favoriteSongs);
+      return true;
     }
+
+    return false;
   };
 
   /**

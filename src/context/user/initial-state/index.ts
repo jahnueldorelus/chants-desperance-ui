@@ -13,11 +13,11 @@ export const initialUserContextState: UserConsumer = {
 
     isSongAFavorite: (arg0) => false,
 
-    getFavoriteSongs: async () => {},
+    getFavoriteSongs: async () => false,
 
-    addFavoriteSong: async (arg0) => {},
+    addFavoriteSong: async (arg0) => false,
 
-    removeFavoriteSong: async (arg0) => {},
+    removeFavoriteSong: async (arg0) => false,
 
     getFavoriteSongById: (arg0) => null,
 

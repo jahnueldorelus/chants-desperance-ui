@@ -3,10 +3,20 @@ import { apiService } from "@services/api";
 import { isAxiosError } from "axios";
 
 class BookService {
+  private books: Book[] | null;
+
+  constructor() {
+    this.books = null;
+  }
+
   /**
    * Retrieves the list of all books.
    */
   async getAllBooks() {
+    if (this.books) {
+      return this.books;
+    }
+
     const response = await apiService.request<Book[]>(
       apiService.routes.get.books.all
     );
@@ -14,6 +24,7 @@ class BookService {
     if (isAxiosError(response)) {
       return null;
     } else {
+      this.books = response.data;
       return response.data;
     }
   }

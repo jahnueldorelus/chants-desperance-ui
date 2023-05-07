@@ -48,11 +48,16 @@ class APIService {
         songs: {
           addFavorite: this.baseApiFavoritesPath.concat("/add"),
           removeFavorite: this.baseApiFavoritesPath.concat("/remove"),
+          addOrUpdate: this.baseApiSongsPath.concat("/add-or-update"),
         },
         sso: this.baseAuthSSOPath + "/sso",
         ssoUser: this.baseAuthSSOPath + "/sso-user",
         ssoDataToApi: this.baseAuthSSOPath + "/sso-data",
-        ssoSignOutAuthRedirect: this.baseAuthSSOPath + "/sign-out-auth-redirect"
+        ssoSignOutAuthRedirect:
+          this.baseAuthSSOPath + "/sign-out-auth-redirect",
+      },
+      delete: {
+        song: this.baseApiSongsPath,
       },
     };
   }

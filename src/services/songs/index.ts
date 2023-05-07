@@ -1,4 +1,6 @@
+import { AddOrUpdateSongInfo, DeleteSongInfo } from "@app-types/services/songs";
 import { Song } from "@app-types/entities/songs";
+import { UserData } from "@app-types/services/auth";
 import { apiService } from "@services/api";
 import { authService } from "@services/auth";
 import { isAxiosError } from "axios";
@@ -108,6 +110,54 @@ class SongsService {
       return false;
     }
   }
+
+  /**
+   * Attempts to update a song.
+   * @param user The user who's authorizing the request
+   * @param songInfo The song's updated info
+   */
+  updateSong = async (
+    user: UserData,
+    songInfo: AddOrUpdateSongInfo
+  ): Promise<boolean> => {
+    if (user && user.isAdmin) {
+      const response = await apiService.request(
+        apiService.routes.post.songs.addOrUpdate,
+        {
+          data: songInfo,
+          method: "POST",
+        }
+      );
+
+      if (!isAxiosError(response)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  /**
+   * Attempts to delete a song.
+   * @param user The user who's authorizing the request
+   */
+  deleteSong = async (
+    user: UserData,
+    deleteSongInfo: DeleteSongInfo
+  ): Promise<boolean> => {
+    if (user && user.isAdmin) {
+      const response = await apiService.request(apiService.routes.delete.song, {
+        data: deleteSongInfo,
+        method: "DELETE",
+      });
+
+      if (!isAxiosError(response)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
   /**
    * Finds a song by song id.

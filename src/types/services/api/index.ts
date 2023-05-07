@@ -22,11 +22,15 @@ export type APIRoute = {
     songs: {
       addFavorite: string;
       removeFavorite: string;
+      addOrUpdate: string;
     };
     sso: string;
     ssoUser: string;
     ssoDataToApi: string;
     ssoSignOutAuthRedirect: string;
+  };
+  delete: {
+    song: string;
   };
 };
 

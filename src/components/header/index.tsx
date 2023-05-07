@@ -230,6 +230,9 @@ export const AppHeader = () => {
           {createNavItem(uiRoutes.songs, "Songs")}
           {userConsumer.state.user &&
             createNavItem(uiRoutes.favorites, "Favorites")}
+          {userConsumer.state.user &&
+            userConsumer.state.user.isAdmin &&
+            createNavItem(uiRoutes.admin, "Admin")}
 
           <Dropdown
             className="app-profile-dropdown ms-4 d-none d-md-flex align-items-center"
@@ -306,6 +309,13 @@ export const AppHeader = () => {
                   createOffCanvasNavItem(
                     uiRoutes.favorites,
                     "Favorites",
+                    onMobileMenuToggle
+                  )}
+                {userConsumer.state.user &&
+                  userConsumer.state.user.isAdmin &&
+                  createOffCanvasNavItem(
+                    uiRoutes.admin,
+                    "Admin",
                     onMobileMenuToggle
                   )}
                 {createOffCanvasNavItem(

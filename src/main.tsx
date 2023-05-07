@@ -8,6 +8,7 @@ import { Songs } from "@views/songs";
 import { Favorites } from "@views/favorites";
 import { Slideshow } from "@components/slideshow";
 import { Authentication } from "@components/authentication";
+import { Admin } from "@views/admin";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,14 @@ const router = createBrowserRouter([
         element: (
           <Authentication pageName="your favorite songs">
             <Favorites />
+          </Authentication>
+        ),
+      },
+      {
+        path: uiRoutes.admin,
+        element: (
+          <Authentication>
+            <Admin />
           </Authentication>
         ),
       },

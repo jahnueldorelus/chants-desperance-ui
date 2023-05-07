@@ -17,4 +17,5 @@ export type UserDataRequest = {
 export type UserData = {
   firstName: string;
   lastName: string;
+  isAdmin: boolean;
 };

@@ -124,13 +124,11 @@ export const Favorites = () => {
   };
 
   /**
-   * Click handler for refetching the user's favorite songs.
+   * Click handler for refreshing the page.
    */
-  const onRefetchFavoritesClick = async (
-    event: MouseEvent<HTMLButtonElement>
-  ) => {
+  const onRefreshPageClick = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    await getFavoriteSongs();
+    location.reload();
   };
 
   /**
@@ -171,8 +169,8 @@ export const Favorites = () => {
             </p>
           </Alert>
 
-          <Button onClick={onRefetchFavoritesClick} type="button">
-            Get Favorites
+          <Button onClick={onRefreshPageClick} type="button">
+            Reload Page
           </Button>
         </Fragment>
       );

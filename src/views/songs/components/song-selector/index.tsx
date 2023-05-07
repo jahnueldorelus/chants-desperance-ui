@@ -16,7 +16,6 @@ type SongSelectorProps = {
   song: Song | null;
   setSelectedBook: (book: Book | null) => void;
   setSelectedSong: (song: Song | null) => void;
-  resetSearchParams: () => void;
 };
 
 export const SongSelector = (props: SongSelectorProps) => {
@@ -39,8 +38,9 @@ export const SongSelector = (props: SongSelectorProps) => {
       const urlSongId = searchParams.get(uiSearchParams.song) || "";
       const tempSong = songsService.findSongById(songs, urlSongId);
 
-      if (!props.book && !tempSong) {
-        props.resetSearchParams();
+      if (!tempSong) {
+        searchParams.delete(uiSearchParams.song);
+        setSearchParams(searchParams);
       }
 
       props.setSelectedSong(tempSong);

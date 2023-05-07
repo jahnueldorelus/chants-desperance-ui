@@ -85,7 +85,6 @@ export const Songs = () => {
         song={selectedSong}
         setSelectedBook={setSelectedBook}
         setSelectedSong={setSelectedSong}
-        resetSearchParams={resetSearchParams}
       />
 
       <SongView

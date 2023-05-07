@@ -25,9 +25,6 @@ class APIService {
 
   private baseAuthSSOPath = this.baseAuthApiPath + "/api/sso";
 
-  constructor(){
-console.log({api: this.baseApiPath, authApi: this.baseAuthApiPath})
-  }
   get routes(): APIRoute {
     return {
       get: {

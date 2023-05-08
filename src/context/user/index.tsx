@@ -133,13 +133,23 @@ const UserProvider = (props: UserProviderProps) => {
 
     const signOutAuthUrl = await authService.signOutUser();
 
-    if (signOutAuthUrl) {
+    setAuthReqProcessing(false);
+
+    // If a sign out auth url given to navigate to
+    if (signOutAuthUrl && typeof signOutAuthUrl === "string") {
       setUser(null);
       location.replace(signOutAuthUrl);
+    } else if (signOutAuthUrl) {
+      /**
+       * If the boolean true was returned (aka user is unauthorized which means
+       * that they are already signed out)
+       */
+      setUser(null);
+      return true;
     }
 
-    setAuthReqProcessing(false);
-    return signOutAuthUrl ? true : false;
+    // An error occurred signing out the user
+    return false;
   };
 
   /**

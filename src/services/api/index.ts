@@ -25,6 +25,10 @@ class APIService {
 
   private baseAuthSSOPath = this.baseAuthApiPath + "/api/sso";
 
+  get authAPIDomain(): string {
+    return this.baseAuthApiPath;
+  }
+
   get routes(): APIRoute {
     return {
       get: {

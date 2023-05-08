@@ -1,16 +1,18 @@
 import { AppHeader } from "@components/header";
 import { Outlet, useLocation } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { AppFooter } from "@components/footer";
 import { appContentHeightService } from "@services/app-content-height";
+import { userContext } from "@context/user";
+import { setupAxiosInterceptors } from "@services/axios-interceptors";
 import "./App.scss";
-import { UserProvider } from "@context/user";
 
 function App() {
   const location = useLocation();
   const headerRef = useRef<HTMLElement>(null);
   const footerRef = useRef<HTMLElement>(null);
   const [minimumContentHeight, setMinimumContentHeight] = useState<number>(0);
+  const userConsumer = useContext(userContext);
 
   /**
    * Handles setting up the app content height service.
@@ -63,8 +65,15 @@ function App() {
     };
   }, []);
 
+  /**
+   * Sets up the axios interceptors.
+   */
+  useEffect(() => {
+    setupAxiosInterceptors(userConsumer.methods);
+  }, []);
+
   return (
-    <UserProvider>
+    <Fragment>
       <header ref={headerRef}>
         <AppHeader />
       </header>
@@ -76,7 +85,7 @@ function App() {
       <footer ref={footerRef}>
         <AppFooter />
       </footer>
-    </UserProvider>
+    </Fragment>
   );
 }
 

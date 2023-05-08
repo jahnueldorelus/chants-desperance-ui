@@ -14,11 +14,12 @@ import {
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { SongsListView } from "@views/songs/components/song-selector/components/songs-list-view";
 import Placeholder from "react-bootstrap/Placeholder";
 import Col from "react-bootstrap/Col";
 import { userContext } from "@context/user";
+import { uiRoutes } from "@components/header/uiRoutes";
 
 export const Favorites = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -124,11 +125,12 @@ export const Favorites = () => {
   };
 
   /**
-   * Click handler for refreshing the page.
+   * Click handler for refetching the user's favorites songs.
    */
-  const onRefreshPageClick = async (event: MouseEvent<HTMLButtonElement>) => {
+  const onRefetchFavoritesClick = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    location.reload();
+    
+    await getFavoriteSongs();
   };
 
   /**
@@ -157,7 +159,15 @@ export const Favorites = () => {
     } else {
       return (
         <Fragment>
-          <h4 className="mt-3">No songs found</h4>
+          {!failedToGetFavoriteSongs && (
+            <h4 className="mt-3">
+              No songs were found. Head over to the&nbsp;
+              <Link className="text-tertiary" to={uiRoutes.songs}>
+                songs
+              </Link>
+              &nbsp;page to add a song to your list of favorites.
+            </h4>
+          )}
           <Alert
             className="px-3 py-2 my-4 d-flex w-fit"
             show={failedToGetFavoriteSongs}
@@ -169,9 +179,11 @@ export const Favorites = () => {
             </p>
           </Alert>
 
-          <Button onClick={onRefreshPageClick} type="button">
-            Reload Page
-          </Button>
+          {failedToGetFavoriteSongs && (
+            <Button onClick={onRefetchFavoritesClick} type="button">
+              Get Favorites Songs
+            </Button>
+          )}
         </Fragment>
       );
     }

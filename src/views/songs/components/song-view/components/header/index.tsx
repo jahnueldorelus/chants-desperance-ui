@@ -36,7 +36,7 @@ export const SongViewHeader = (props: SongViewHeaderProps) => {
    */
   useEffect(() => {
     setIsSongAFavorite(userConsumer.methods.isSongAFavorite(props.song));
-  }, [props.song, updatingFavStatus]);
+  }, [props.song, updatingFavStatus, userConsumer.state.favoriteSongs]);
 
   /**
    * Sends an email of the selected song using the user's mail client.

@@ -1,14 +1,14 @@
 import { Song } from "@app-types/entities/songs";
 import { UserData } from "@app-types/services/auth";
 
-export type UserState = {
+export type UserConsumerState = {
   user: UserData | null;
   favoriteSongs: Map<string, Song>;
   ssoAuthUrl: string | null;
   authProcessing: boolean;
 };
 
-export type UserMethods = {
+export type UserConsumerMethods = {
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
   isSongAFavorite: (song: Song) => boolean;
   getFavoriteSongs: () => Promise<boolean>;
@@ -22,8 +22,8 @@ export type UserMethods = {
 };
 
 export type UserConsumer = {
-  state: UserState;
-  methods: UserMethods;
+  state: UserConsumerState;
+  methods: UserConsumerMethods;
 };
 
 export type UserProviderProps = {

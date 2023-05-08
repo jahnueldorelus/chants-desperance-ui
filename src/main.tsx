@@ -9,6 +9,7 @@ import { Favorites } from "@views/favorites";
 import { Slideshow } from "@components/slideshow";
 import { Authentication } from "@components/authentication";
 import { Admin } from "@views/admin";
+import { UserProvider } from "@context/user";
 
 const router = createBrowserRouter([
   {
@@ -42,7 +43,9 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <UserProvider>
+      <RouterProvider router={router} />
+    </UserProvider>
     <Slideshow />
   </React.StrictMode>
 );

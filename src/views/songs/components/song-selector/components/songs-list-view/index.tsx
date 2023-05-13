@@ -6,22 +6,21 @@ import { Book } from "@app-types/entities/books";
 
 type SongsListViewProps = {
   songs: Song[];
-  books?: Book[];
+  book: Book;
   onSongClick: (song: Song) => () => void;
 };
 
 export const SongsListView = (props: SongsListViewProps) => {
-
   return (
     <Fragment>
       <DesktopViewSongsList
         songs={props.songs}
-        books={props.books}
+        book={props.book}
         onSongClick={props.onSongClick}
       />
       <MobileViewSongsList
         songs={props.songs}
-        books={props.books}
+        book={props.book}
         onSongClick={props.onSongClick}
       />
     </Fragment>

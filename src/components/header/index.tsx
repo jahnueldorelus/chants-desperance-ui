@@ -124,13 +124,13 @@ export const AppHeader = () => {
 
       return (
         <Fragment>
-          <li className="mb-0 py-2 px-2 text-white">
+          <div className="mb-0 py-2 px-2 text-white">
             Logged in as
             <br />
             <span className="text-secondary">
               <strong>{userFullName}</strong>
             </span>
-          </li>
+          </div>
 
           <Dropdown.Divider className="mx-2 bg-white" />
         </Fragment>
@@ -213,7 +213,7 @@ export const AppHeader = () => {
 
   return (
     <Navbar className="app-navbar py-1" bg="tertiary" expand="md">
-      <Container className="justify-content-md-center position-relative">
+      <Container className="flex-row-reverse flex-md-row justify-content-md-center position-relative">
         {/* Desktop Navigation */}
         <Nav>
           <Navbar.Brand className="mx-2 mx-md-4">
@@ -243,6 +243,7 @@ export const AppHeader = () => {
               className="p-0 bg-transparent d-flex align-items-center rounded-circle border-0"
               aria-expanded={isUserDropdownVisible}
               aria-controls={desktopUserMenuId}
+              aria-label="more navigation options"
             >
               {/* Shows a loader instead of the user profile image if an auth request is processing */}
               {userConsumer.state.authProcessing ? (
@@ -261,22 +262,23 @@ export const AppHeader = () => {
               }
               id={desktopUserMenuId}
               align="start"
-              as="ul"
             >
               {loggedInUserDropdownInfo()}
-              <li>
-                <Button
-                  className="p-0 border-0 w-100 text-start"
-                  onClick={userConsumer.state.user ? signOutUser : signInUser}
-                >
-                  <Dropdown.Item
-                    className="dropdown-menu-item py-2 m-0 fs-5 rounded"
-                    as="h2"
+              <ul className="p-0 m-0">
+                <li>
+                  <Button
+                    className="p-0 border-0 w-100 text-start"
+                    onClick={userConsumer.state.user ? signOutUser : signInUser}
                   >
-                    {userConsumer.state.user ? "Log Out" : "Login"}
-                  </Dropdown.Item>
-                </Button>
-              </li>
+                    <Dropdown.Item
+                      className="dropdown-menu-item py-2 m-0 fs-5 rounded"
+                      as="h2"
+                    >
+                      {userConsumer.state.user ? "Logout" : "Login"}
+                    </Dropdown.Item>
+                  </Button>
+                </li>
+              </ul>
             </Dropdown.Menu>
           </Dropdown>
         </Nav>
@@ -285,13 +287,14 @@ export const AppHeader = () => {
         <Navbar.Toggle
           className="app-nav-toggle px-2 py-0 mx-2 my-1 bg-white border-transparent"
           onClick={onMobileMenuToggle}
+          label="toggle navigation menu"
           aria-controls={mobileNavId}
         />
 
         <Offcanvas
           backdropClassName="bg-primary"
           id={mobileNavId}
-          placement="end"
+          placement="start"
           show={isOffcanvasVisible}
           onHide={onMobileMenuToggle}
         >
@@ -320,7 +323,7 @@ export const AppHeader = () => {
                   )}
                 {createOffCanvasNavItem(
                   userConsumer.state.user ? "/login" : "/logout",
-                  userConsumer.state.user ? "Log Out" : "Login",
+                  userConsumer.state.user ? "Logout" : "Login",
                   userConsumer.state.user ? signOutUser : signInUser
                 )}
               </Nav>

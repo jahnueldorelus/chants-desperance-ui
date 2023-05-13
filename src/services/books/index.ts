@@ -49,11 +49,11 @@ class BookService {
    */
   getBookLanguage(book: Book) {
     if (book.lang === "fr") {
-      return "French";
+      return "Français";
     } else if (book.lang === "kr") {
-      return "Kreyol";
+      return "Kréyol";
     } else {
-      return "Kreyol and French";
+      return "Kréyol and Français";
     }
   }
 

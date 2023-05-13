@@ -1,5 +1,5 @@
 import { slideshowService } from "@services/slideshow";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Reveal from "reveal.js";
 import CloseIcon from "@assets/close.svg";
 import FullscreenIcon from "@assets/fullscreen.svg";
@@ -7,6 +7,7 @@ import { screenService } from "@services/screen";
 import "./index.scss";
 
 export const Slideshow = () => {
+  useState<NodeListOf<HTMLElement> | null>(null);
   const slideshowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,12 +27,19 @@ export const Slideshow = () => {
     slideshowService.enablePageScroll();
   }, []);
 
+  /**
+   * Toggles fullscreen mode of the browser.
+   */
   const toggleFullscreen = () => {
     slideshowService.toggleFullscreen();
   };
 
+  /**
+   * Closes out of fullscreen mode (if active) and closes out
+   * the slideshow.
+   */
   const onClose = async () => {
-   await slideshowService.closeFullscreen();
+    await slideshowService.closeFullscreen();
     slideshowService.closeSlideshow();
   };
 
@@ -66,7 +74,13 @@ export const Slideshow = () => {
   };
 
   return (
-    <div className="slideshow slideshow-initial-view" ref={slideshowRef}>
+    <div
+      id="slideshow-wrapper"
+      className="slideshow slideshow-initial-view"
+      role="dialog"
+      aria-modal={true}
+      ref={slideshowRef}
+    >
       {/* Slide show controls */}
       {slideshowControlsJSX()}
 

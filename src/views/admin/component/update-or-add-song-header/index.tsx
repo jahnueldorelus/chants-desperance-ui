@@ -264,10 +264,10 @@ export const UpdateOrAddSongHeader = (props: UpdateOrAddSongHeaderProps) => {
               >
                 <option value="">Select a language</option>
                 <option key="kr" value="kr">
-                  Kreyol
+                  Kréyol
                 </option>
                 <option key="fr" value="fr">
-                  French
+                  Français
                 </option>
               </Form.Select>
             </Form.Label>

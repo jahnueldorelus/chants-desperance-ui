@@ -9,6 +9,7 @@ import { Book } from "@app-types/entities/books";
 import { useSearchParams } from "react-router-dom";
 import { uiSearchParams } from "@components/header/uiSearchParams";
 import "./index.scss";
+import { bookService } from "@services/books";
 
 type BookSelectorProps = {
   selectedBook: Book | null;
@@ -91,7 +92,13 @@ export const BookSelector = (props: BookSelectorProps) => {
             className="book-list-item-btn d-flex justify-content-end align-items-center"
             xs={3}
           >
-            <Button type="button" onClick={onBookClick(book)}>
+            <Button
+              type="button"
+              onClick={onBookClick(book)}
+              aria-label={`Open the book ${
+                book.name
+              } ${bookService.getBookLanguage(book)}`}
+            >
               Open
             </Button>
           </Col>
@@ -149,13 +156,13 @@ export const BookSelector = (props: BookSelectorProps) => {
         activeKey={selectedTab}
         onSelect={onTabSelect}
       >
-        <Tab eventKey={tabKeys.french} title="French">
+        <Tab eventKey={tabKeys.french} title="Français">
           {getBooksListJSX()}
         </Tab>
-        <Tab eventKey={tabKeys.kreyol} title="Kreyol">
+        <Tab eventKey={tabKeys.kreyol} title="Kréyol">
           {getBooksListJSX()}
         </Tab>
-        <Tab eventKey={tabKeys.kreyolFrench} title="Kreyol and French">
+        <Tab eventKey={tabKeys.kreyolFrench} title="Kréyol and Français">
           {getBooksListJSX()}
         </Tab>
       </Tabs>

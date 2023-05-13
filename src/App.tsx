@@ -1,18 +1,23 @@
 import { AppHeader } from "@components/header";
 import { Outlet, useLocation } from "react-router-dom";
-import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AppFooter } from "@components/footer";
 import { appContentHeightService } from "@services/app-content-height";
 import { userContext } from "@context/user";
 import { setupAxiosInterceptors } from "@services/axios-interceptors";
+import { FocusableReference } from "@components/focusable-reference";
+import Button from "react-bootstrap/Button";
 import "./App.scss";
 
 function App() {
   const location = useLocation();
+  const topOfPageRef = useRef<HTMLDivElement>(null);
+  const topOfMainRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const footerRef = useRef<HTMLElement>(null);
   const [minimumContentHeight, setMinimumContentHeight] = useState<number>(0);
   const userConsumer = useContext(userContext);
+  const navigationZIndex = 990;
 
   /**
    * Handles setting up the app content height service.
@@ -36,6 +41,12 @@ function App() {
    */
   useEffect(() => {
     appContentHeightService.calculateNewHeight();
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    if (topOfPageRef.current) {
+      topOfPageRef.current.focus();
+    }
   }, [location.pathname]);
 
   useEffect(() => {
@@ -72,20 +83,47 @@ function App() {
     setupAxiosInterceptors(userConsumer.methods);
   }, []);
 
+  /**
+   * Changes the focus to the main content.
+   */
+  const onSkipMainContentClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+
+    if (topOfMainRef.current) {
+      topOfMainRef.current.focus();
+    }
+  };
+
   return (
-    <Fragment>
+    <div id="test-content">
+      <FocusableReference ref={topOfPageRef} />
+
+      <Button
+        className="visually-hidden-focusable px-2 py-1 ms-2 mt-2 mb-0 bg-white text-primary border border-primary rounded w-fit position-absolute top-0"
+        style={{ zIndex: navigationZIndex + 1 }}
+        onClick={onSkipMainContentClick}
+      >
+        Skip to main content
+      </Button>
+
+      {/* Header of the application */}
       <header ref={headerRef}>
         <AppHeader />
       </header>
 
-      <main style={{ minHeight: minimumContentHeight }}>
+      {/* Main content of the application */}
+      <FocusableReference ref={topOfMainRef} />
+
+      <main className="mx-3" style={{ minHeight: minimumContentHeight }}>
         <Outlet />
       </main>
 
       <footer ref={footerRef}>
         <AppFooter />
       </footer>
-    </Fragment>
+    </div>
   );
 }
 

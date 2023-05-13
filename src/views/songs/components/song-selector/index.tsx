@@ -112,8 +112,14 @@ export const SongSelector = (props: SongSelectorProps) => {
           ))}
         </Col>
       );
-    } else if (songs && songs.length > 0) {
-      return <SongsListView songs={songs} onSongClick={onSongClick} />;
+    } else if (props.book && songs && songs.length > 0) {
+      return (
+        <SongsListView
+          book={props.book}
+          songs={songs}
+          onSongClick={onSongClick}
+        />
+      );
     } else {
       return (
         <div className="mt-3">
@@ -126,7 +132,11 @@ export const SongSelector = (props: SongSelectorProps) => {
   if (props.book && !props.song) {
     return (
       <div>
-        <Button type="button" onClick={onClickGoBack}>
+        <Button
+          type="button"
+          onClick={onClickGoBack}
+          aria-label="Go back to select a book"
+        >
           Go Back
         </Button>
 

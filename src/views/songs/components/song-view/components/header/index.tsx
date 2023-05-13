@@ -5,7 +5,7 @@ import Badge from "react-bootstrap/Badge";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { Verse } from "@app-types/entities/verses";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { bookService } from "@services/books";
 import { emailService } from "@services/email";
@@ -30,11 +30,13 @@ export const SongViewHeader = (props: SongViewHeaderProps) => {
     useState(false);
   const [isSongAFavorite, setIsSongAFavorite] = useState(false);
   const userConsumer = useContext(userContext);
+  const presentButtonRef = useRef<HTMLButtonElement | null>(null)
 
   /**
    * Retrieves the updated status of the song as a favorite
    */
   useEffect(() => {
+    slideshowService.presentButtonRef = presentButtonRef;
     setIsSongAFavorite(userConsumer.methods.isSongAFavorite(props.song));
   }, [props.song, updatingFavStatus, userConsumer.state.favoriteSongs]);
 
@@ -166,6 +168,10 @@ export const SongViewHeader = (props: SongViewHeaderProps) => {
   };
 
   if (props.show) {
+    const songTitle = `song number ${props.song.bookNum}, ${props.song.name}, ${
+      props.book.name
+    } ${bookService.getBookLanguage(props.book)}`;
+
     return (
       <div className="d-flex flex-wrap justify-content-between align-items-center">
         {/* The given book name and language */}
@@ -197,7 +203,32 @@ export const SongViewHeader = (props: SongViewHeaderProps) => {
               type="button"
               onClick={isSongAFavorite ? removeFavoriteSong : addFavoriteSong}
               aria-disabled={!userConsumer.state.user || updatingFavStatus}
+              aria-labelledby={
+                userConsumer.state.user
+                  ? "favorite-button-label-user-exists"
+                  : "favorite-button-label-no-user"
+              }
             >
+              {/* Visually hidden text (for screen readers) - If the user exists */}
+              <p
+                id="favorite-button-label-user-exists"
+                className="visually-hidden"
+              >
+                {isSongAFavorite
+                  ? `remove from favorites ${songTitle} `
+                  : `add to favorites ${songTitle}`}
+              </p>
+
+              {/* Visually hidden text (for screen readers) - If the user doesn't exists */}
+              <p id="favorite-button-label-no-user" className="visually-hidden">
+                {isSongAFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                ,&nbsp;
+                {!userConsumer.state.user || updatingFavStatus
+                  ? "button disabled"
+                  : ""}
+                , log in to add this song as a favorite
+              </p>
+
               {isSongAFavorite ? "Remove from Favorites" : "Add to Favorites"}
             </Button>
           </OverlayTrigger>
@@ -207,20 +238,38 @@ export const SongViewHeader = (props: SongViewHeaderProps) => {
             className="mt-3 mt-md-0 me-3"
             type="button"
             onClick={onSendEmailClick}
+            aria-label={`email ${songTitle}`}
           >
             Email
           </Button>
 
           {/* Download button and dropdown */}
           <Dropdown className="d-inline-block">
-            <Dropdown.Toggle className="mt-3 mt-md-0 me-3" variant="primary">
+            <Dropdown.Toggle
+              className="mt-3 mt-md-0 me-3"
+              variant="primary"
+              aria-label={`download ${songTitle}`}
+            >
               Download
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
-              <Dropdown.Item onClick={onDownloadTextClick}>Text</Dropdown.Item>
-              <Dropdown.Item onClick={onDownloadWordClick}>Word</Dropdown.Item>
-              <Dropdown.Item onClick={onDownloadPowerPointClick}>
+              <Dropdown.Item
+                onClick={onDownloadTextClick}
+                aria-label="download the song as a text file"
+              >
+                Text
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={onDownloadWordClick}
+                aria-label="download the song as a microsoft word document"
+              >
+                Word
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={onDownloadPowerPointClick}
+                aria-label="download the song as a microsoft powerpoint document"
+              >
                 PowerPoint
               </Dropdown.Item>
             </Dropdown.Menu>
@@ -231,6 +280,8 @@ export const SongViewHeader = (props: SongViewHeaderProps) => {
             className="mt-3 mt-md-0"
             type="button"
             onClick={openSlideshow}
+            aria-label={`open in presentation mode ${songTitle}`}
+            ref={presentButtonRef}
           >
             Present
           </Button>

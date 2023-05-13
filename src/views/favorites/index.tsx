@@ -14,12 +14,14 @@ import {
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
+import Badge from "react-bootstrap/Badge";
 import { Link, useSearchParams } from "react-router-dom";
 import { SongsListView } from "@views/songs/components/song-selector/components/songs-list-view";
 import Placeholder from "react-bootstrap/Placeholder";
 import Col from "react-bootstrap/Col";
 import { userContext } from "@context/user";
 import { uiRoutes } from "@components/header/uiRoutes";
+import "./index.scss";
 
 export const Favorites = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -127,9 +129,11 @@ export const Favorites = () => {
   /**
    * Click handler for refetching the user's favorites songs.
    */
-  const onRefetchFavoritesClick = async (event: MouseEvent<HTMLButtonElement>) => {
+  const onRefetchFavoritesClick = async (
+    event: MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
-    
+
     await getFavoriteSongs();
   };
 
@@ -138,6 +142,14 @@ export const Favorites = () => {
    */
   const favoriteSongsListJSX = () => {
     if (books && userConsumer.state.favoriteSongs.size > 0) {
+      // Creates a map of every book and its associated user favorite songs
+      const tempBookSongs: Map<string, { book: Book; songs: Song[] }> =
+        new Map();
+
+      books.forEach((book) => {
+        tempBookSongs.set(book._id, { book, songs: [] });
+      });
+
       // The user's list of favorite songs (sorted by book and song number)
       const favoriteSongs = [...userConsumer.state.favoriteSongs.values()].sort(
         (a, b) => {
@@ -149,13 +161,49 @@ export const Favorites = () => {
         }
       );
 
-      return (
-        <SongsListView
-          songs={favoriteSongs}
-          books={books}
-          onSongClick={onSongClick}
-        />
-      );
+      // Adds each song to their associated book
+      favoriteSongs.forEach((song) => {
+        const bookSongsInfo = tempBookSongs.get(song.catId);
+
+        if (bookSongsInfo) {
+          const tempSongsList = [...bookSongsInfo.songs];
+          tempSongsList.push(song);
+
+          tempBookSongs.set(song.catId, {
+            book: bookSongsInfo.book,
+            songs: tempSongsList,
+          });
+        }
+      });
+
+      /**
+       * Returns the JSX of every book and the list of their associated
+       * user favorite songs if there are any.
+       */
+      return [...tempBookSongs.values()].map((bookSongsInfo) => {
+        if (bookSongsInfo.songs.length > 0) {
+          return (
+            <div className="songs-list" key={bookSongsInfo.book._id}>
+              <div className="d-flex align-items-center">
+                <h2 className="text-tertiary">{bookSongsInfo.book.name}</h2>
+                <h4>
+                  <Badge className="ms-3" bg="tertiary">
+                    {bookService.getBookLanguage(bookSongsInfo.book)}
+                  </Badge>
+                </h4>
+              </div>
+
+              <SongsListView
+                songs={bookSongsInfo.songs}
+                book={bookSongsInfo.book}
+                onSongClick={onSongClick}
+              />
+            </div>
+          );
+        } else {
+          return null;
+        }
+      });
     } else {
       return (
         <Fragment>

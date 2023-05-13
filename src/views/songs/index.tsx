@@ -8,6 +8,7 @@ import { useSearchParams } from "react-router-dom";
 import { uiSearchParams } from "@components/header/uiSearchParams";
 import { bookService } from "@services/books";
 import { Song } from "@app-types/entities/songs";
+import { FocusableReference } from "@components/focusable-reference";
 
 export const Songs = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,6 +17,7 @@ export const Songs = () => {
   const [books, setBooks] = useState<Book[] | null>(null);
   const loadingBooks = useRef(true);
   const attemptedAPIRequest = useRef(false);
+  const topOfPageRef = useRef<HTMLDivElement>(null);
 
   /**
    * Retrieves the list of books and sets the selected book if
@@ -27,6 +29,15 @@ export const Songs = () => {
       getBooks();
     }
   }, []);
+
+  // Sets the focus back to the page after the selected book or song changes.
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    if (topOfPageRef.current) {
+      topOfPageRef.current.focus();
+    }
+  }, [selectedBook, selectedSong]);
 
   /**
    * Retrieves the list of books.
@@ -72,6 +83,8 @@ export const Songs = () => {
 
   return (
     <Container className="py-5">
+      <FocusableReference ref={topOfPageRef} />
+
       <BookSelector
         books={books}
         selectedBook={selectedBook}

@@ -7,18 +7,17 @@ import { bookService } from "@services/books";
 
 type SongsListDesktopViewProps = {
   songs: Song[];
-  books?: Book[];
+  book: Book;
   onSongClick: (song: Song) => () => void;
 };
 
 export const DesktopViewSongsList = (props: SongsListDesktopViewProps) => {
   return (
-    <Col className="mt-3 d-none d-sm-block" md={8}>
-      <Table>
+    <Col className="mt-3 d-none d-sm-block" md={12} lg={10}>
+      <Table hover>
         <thead>
           <tr>
             <th>#</th>
-            {props.books && <th>Book</th>}
             <th>Name</th>
             <th># of Verses</th>
             <th>Has Chorus</th>
@@ -27,18 +26,22 @@ export const DesktopViewSongsList = (props: SongsListDesktopViewProps) => {
         </thead>
         <tbody>
           {props.songs.map((song) => {
-            const songBook = bookService.findBookById(props.books, song.catId);
-            const songBookAbbrv = songBook ? songBook.abbrv : "N/A";
+            const bookName = props.book.name;
+            const bookLanguage = bookService.getBookLanguage(props.book);
 
             return (
               <tr className="align-middle" key={song._id}>
                 <td>{song.bookNum}</td>
-                {props.books && <td>{songBookAbbrv}</td>}
                 <td>{song.name}</td>
                 <td>{song.numOfVerses}</td>
                 <td>{song.hasChorus ? "Yes" : "No"}</td>
                 <td>
-                  <Button onClick={props.onSongClick(song)}>Open</Button>
+                  <Button
+                    onClick={props.onSongClick(song)}
+                    aria-label={`Open song number ${song.bookNum}, ${song.name}, ${bookName} ${bookLanguage}`}
+                  >
+                    Open
+                  </Button>
                 </td>
               </tr>
             );

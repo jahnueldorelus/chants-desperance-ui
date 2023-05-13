@@ -1,12 +1,12 @@
 import { Song } from "@app-types/entities/songs";
 import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
-import { bookService } from "@services/books";
 import { Book } from "@app-types/entities/books";
+import { bookService } from "@services/books";
 
 type SongsListMobileViewProps = {
   songs: Song[];
-  books?: Book[];
+  book: Book;
   onSongClick: (song: Song) => () => void;
 };
 
@@ -24,35 +24,26 @@ export const MobileViewSongsList = (props: SongsListMobileViewProps) => {
   return (
     <Accordion className="mt-3 d-sm-none">
       {props.songs.map((song, index) => {
-        const songBook = bookService.findBookById(props.books, song.catId);
-        let songBookLang: string = "";
-        let songBookName: string = "";
-
-        if (songBook) {
-          switch (songBook.lang) {
-            case "fr":
-              songBookLang = "French";
-              break;
-            case "kr":
-              songBookLang = "Kreyol";
-              break;
-            case "kr-fr":
-              songBookLang = "Kreyol and French";
-              break;
-          }
-
-          songBookName = `${songBook.name} (${songBookLang})`;
-        }
+        const songBook = props.book;
+        const songBookLanguage = bookService.getBookLanguage(songBook);
+        const songBookName = `${songBook.name} (${songBookLanguage})`;
+        const openButtonAriaLabel = `Open song number ${song.bookNum}, ${song.name}, ${songBook.name} ${songBookLanguage}`;
 
         return (
           <Accordion.Item eventKey={index.toString()} key={song._id}>
-            <Accordion.Header as="h2">
+            <Accordion.Header as="p">
+              {/* Only announced by screen reader */}
+              <span className="visually-hidden">song number</span>
+
               <span className="me-2 fs-6 fw-bold text-primary d-inline-block">
                 {song.bookNum}&#41;
               </span>
               <span className="me-2 text-primary d-inline-block">
                 {song.name}
               </span>
+
+              {/* Only announced by screen reader */}
+              <span className="visually-hidden">{`, ${songBook.name} ${songBookLanguage}`}</span>
             </Accordion.Header>
 
             <Accordion.Body className="text-tertiary">
@@ -65,7 +56,11 @@ export const MobileViewSongsList = (props: SongsListMobileViewProps) => {
 
               {createSongInfoText("Has Chorus:", song.hasChorus ? "Yes" : "No")}
 
-              <Button className="mt-3 w-100" onClick={props.onSongClick(song)}>
+              <Button
+                className="mt-3 w-100"
+                onClick={props.onSongClick(song)}
+                aria-label={openButtonAriaLabel}
+              >
                 Open
               </Button>
             </Accordion.Body>

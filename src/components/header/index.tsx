@@ -10,7 +10,7 @@ import Spinner from "react-bootstrap/Spinner";
 import CloseButton from "react-bootstrap/CloseButton";
 import { NavLink } from "react-router-dom";
 import { uiRoutes } from "@components/header/uiRoutes";
-import CELogo from "@assets/chants-desperance.png";
+import CELogo from "@assets/chants-desperance.svg";
 import UserSvg from "@assets/user.svg";
 import { userContext } from "@context/user";
 import "./index.scss";

@@ -98,9 +98,9 @@ export const SongSelector = (props: SongSelectorProps) => {
    * Displays the list of songs in the selected book.
    */
   const listOfSongsJSX = () => {
-    if (!loadingSongs) {
+    if (loadingSongs) {
       return (
-        <Col className="mt-3"  sm={12} md={8} lg={5} xl={4}>
+        <Col className="mt-3" sm={12} md={8} lg={5} xl={4}>
           {[1, 2, 3].map((num) => (
             <div className="px-3 py-3 mb-3 border rounded" key={num}>
               <Placeholder animation="glow">

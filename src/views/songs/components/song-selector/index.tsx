@@ -45,7 +45,7 @@ export const SongSelector = (props: SongSelectorProps) => {
 
       props.setSelectedSong(tempSong);
     }
-  }, [songs]);
+  }, [songs, searchParams]);
 
   /**
    * Retrieves the list of songs in the selected book if available.

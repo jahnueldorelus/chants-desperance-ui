@@ -45,6 +45,13 @@ export const Favorites = () => {
   }, []);
 
   /**
+   * Sets the selected book if one is given in the url
+   */
+  useEffect(() => {
+    getBookAndSongFromUrl();
+  }, [books, searchParams]);
+
+  /**
    * Retrieves the list of the user's favorite songs.
    */
   const getFavoriteSongs = async () => {
@@ -57,8 +64,18 @@ export const Favorites = () => {
     const retrievedFavoriteSongs =
       await userConsumer.methods.getFavoriteSongs();
 
-    // Sets the selected song if a song id is found within the URL
-    if (retrievedFavoriteSongs) {
+    if (!retrievedFavoriteSongs) {
+      setFailedToGetFavoriteSongs(true);
+    }
+
+    setLoadingData(false);
+  };
+
+  /**
+   * Retrieves the selected song from the url if it exists.
+   */
+  const getBookAndSongFromUrl = () => {
+    if (!!books && !!userConsumer.state.favoriteSongs) {
       const urlSongId = searchParams.get(uiSearchParams.song) || "";
       const tempSong = userConsumer.methods.getFavoriteSongById(urlSongId);
 
@@ -67,11 +84,7 @@ export const Favorites = () => {
       }
 
       setSelectedSong(tempSong);
-    } else {
-      setFailedToGetFavoriteSongs(true);
     }
-
-    setLoadingData(false);
   };
 
   /**

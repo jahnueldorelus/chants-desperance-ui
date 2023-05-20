@@ -30,6 +30,13 @@ export const Songs = () => {
     }
   }, []);
 
+  /**
+   * Sets the selected book if one is given in the url
+   */
+  useEffect(() => {
+    getBookFromUrl();
+  }, [books, searchParams]);
+
   // Sets the focus back to the page after the selected book or song changes.
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -45,8 +52,8 @@ export const Songs = () => {
   const getBooks = async () => {
     let booksList = await bookService.getAllBooks();
 
+    // Sorts books by name
     if (booksList) {
-      // Sorts books by name
       booksList = booksList.sort((bookOne, bookTwo) => {
         if (bookOne.name > bookTwo.name) {
           return 1;
@@ -56,20 +63,29 @@ export const Songs = () => {
           return 0;
         }
       });
-
-      // Sets the selected book if a book id is found within the URL
-      const urlBookId = searchParams.get(uiSearchParams.book);
-      const tempBook = bookService.findBookById(booksList, urlBookId);
-
-      if (!tempBook) {
-        resetSearchParams();
-      }
-
-      setSelectedBook(tempBook);
     }
 
     setBooks(booksList || []);
     loadingBooks.current = false;
+  };
+
+  /**
+   * Retrieves the selected book from the url if it exists.
+   */
+  const getBookFromUrl = () => {
+    if (books) {
+      const urlBookId = searchParams.get(uiSearchParams.book);
+
+      if (!selectedBook || (!!selectedBook && selectedBook._id !== urlBookId)) {
+        const tempBook = bookService.findBookById(books, urlBookId);
+
+        if (!tempBook) {
+          resetSearchParams();
+        }
+
+        setSelectedBook(tempBook);
+      }
+    }
   };
 
   /**

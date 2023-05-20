@@ -63,9 +63,9 @@ export const BookSelector = (props: BookSelectorProps) => {
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.preventDefault();
 
+      props.setSelectedBook(book);
       searchParams.set(uiSearchParams.book, book._id);
       setSearchParams(searchParams);
-      props.setSelectedBook(book);
     };
 
   /**

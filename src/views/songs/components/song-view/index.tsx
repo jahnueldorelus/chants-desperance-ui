@@ -110,7 +110,11 @@ export const SongView = (props: SongViewProps) => {
 
     return (
       <div>
-        <Button type="button" onClick={onClickGoBack} aria-label="Go back to select a song">
+        <Button
+          type="button"
+          onClick={onClickGoBack}
+          aria-label="Go back to select a song"
+        >
           Go Back
         </Button>
 

@@ -223,16 +223,18 @@ export const AppHeader = () => {
             aria-controls={mobileNavId}
           />
 
-          <Navbar.Brand className="mx-2 mx-md-4">
-            <div className="me-0 d-flex align-items-center text-white text-decoration-none fs-3">
-              <img
-                className="me-2"
-                src={CELogo}
-                alt="Chants d'Esperance logo"
-                width="40"
-              />
-              <h1 className="m-0 fs-2">CE</h1>
-            </div>
+          <Navbar.Brand>
+            <NavLink className="text-decoration-none" to={uiRoutes.songs}>
+              <div className="me-0 d-flex align-items-center text-white text-decoration-none fs-3">
+                <img
+                  className="me-2"
+                  src={CELogo}
+                  alt="Chants d'Esperance logo"
+                  width="40"
+                />
+                <h1 className="m-0 fs-2">CE</h1>
+              </div>
+            </NavLink>
           </Navbar.Brand>
 
           <div className="d-none d-md-flex">

@@ -11,10 +11,9 @@ export const AppFooter = () => {
           Created by&nbsp;
           <a
             className="text-info text-decoration-none"
-            href="https://www.linkedin.com/in/jahnueldorelus/"
+            href="https://www.jahnueldorelus.com"
             target="_blank"
-            rel="nofollow"
-            aria-label="visit Jahnuel Dorelus's LinkedIn profile"
+            aria-label="Jahnuel Dorelus's personal website"
           >
             Jahnuel Dorelus
           </a>

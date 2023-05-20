@@ -272,7 +272,7 @@ export const AppHeader = () => {
                   (userConsumer.state.authProcessing ? " d-none" : "")
                 }
                 id={desktopUserMenuId}
-                align="start"
+                align="end"
               >
                 {loggedInUserDropdownInfo()}
                 <ul className="p-0 m-0">

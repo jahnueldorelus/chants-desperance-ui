@@ -215,7 +215,14 @@ export const AppHeader = () => {
     <Navbar className="app-navbar py-1" bg="tertiary" expand="md">
       <Container className="flex-row-reverse flex-md-row justify-content-md-center position-relative">
         {/* Desktop Navigation */}
-        <Nav>
+        <Nav className="flex-row align-items-center justify-content-between w-100">
+          <Navbar.Toggle
+            className="app-nav-toggle px-2 py-0 mx-2 my-1 bg-white border-transparent w-fit"
+            onClick={onMobileMenuToggle}
+            label="toggle navigation menu"
+            aria-controls={mobileNavId}
+          />
+
           <Navbar.Brand className="mx-2 mx-md-4">
             <div className="me-0 d-flex align-items-center text-white text-decoration-none fs-3">
               <img
@@ -227,70 +234,68 @@ export const AppHeader = () => {
               <h1 className="m-0 fs-2">CE</h1>
             </div>
           </Navbar.Brand>
-          {createNavItem(uiRoutes.songs, "Songs")}
-          {userConsumer.state.user &&
-            createNavItem(uiRoutes.favorites, "Favorites")}
-          {userConsumer.state.user &&
-            userConsumer.state.user.isAdmin &&
-            createNavItem(uiRoutes.admin, "Admin")}
 
-          <Dropdown
-            className="app-profile-dropdown ms-4 d-none d-md-flex align-items-center"
-            onToggle={onUserMenuOptionsToggle}
-            as={Nav.Item}
-          >
-            <Dropdown.Toggle
-              className="p-0 bg-transparent d-flex align-items-center rounded-circle border-0"
-              aria-expanded={isUserDropdownVisible}
-              aria-controls={desktopUserMenuId}
-              aria-label="more navigation options"
-            >
-              {/* Shows a loader instead of the user profile image if an auth request is processing */}
-              {userConsumer.state.authProcessing ? (
-                <Spinner className="me-1" animation="border">
-                  <span className="visually-hidden">Loading...</span>
-                </Spinner>
-              ) : (
-                getUserProfileImgJSX()
-              )}
-            </Dropdown.Toggle>
+          <div className="d-none d-md-flex">
+            {createNavItem(uiRoutes.songs, "Songs")}
+            {userConsumer.state.user &&
+              createNavItem(uiRoutes.favorites, "Favorites")}
+            {userConsumer.state.user &&
+              userConsumer.state.user.isAdmin &&
+              createNavItem(uiRoutes.admin, "Admin")}
 
-            <Dropdown.Menu
-              className={
-                "user-dropdown-menu bg-primary p-2 overflow-hidden" +
-                (userConsumer.state.authProcessing ? " d-none" : "")
-              }
-              id={desktopUserMenuId}
-              align="start"
+            <Dropdown
+              className="app-profile-dropdown ms-4 d-none d-md-flex align-items-center"
+              onToggle={onUserMenuOptionsToggle}
+              as={Nav.Item}
             >
-              {loggedInUserDropdownInfo()}
-              <ul className="p-0 m-0">
-                <li>
-                  <Button
-                    className="p-0 border-0 w-100 text-start"
-                    onClick={userConsumer.state.user ? signOutUser : signInUser}
-                  >
-                    <Dropdown.Item
-                      className="dropdown-menu-item py-2 m-0 fs-5 rounded"
-                      as="h2"
+              <Dropdown.Toggle
+                className="p-0 bg-transparent d-flex align-items-center rounded-circle border-0"
+                aria-expanded={isUserDropdownVisible}
+                aria-controls={desktopUserMenuId}
+                aria-label="more navigation options"
+              >
+                {/* Shows a loader instead of the user profile image if an auth request is processing */}
+                {userConsumer.state.authProcessing ? (
+                  <Spinner className="me-1" animation="border">
+                    <span className="visually-hidden">Loading...</span>
+                  </Spinner>
+                ) : (
+                  getUserProfileImgJSX()
+                )}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu
+                className={
+                  "user-dropdown-menu bg-primary p-2 overflow-hidden" +
+                  (userConsumer.state.authProcessing ? " d-none" : "")
+                }
+                id={desktopUserMenuId}
+                align="start"
+              >
+                {loggedInUserDropdownInfo()}
+                <ul className="p-0 m-0">
+                  <li>
+                    <Button
+                      className="p-0 border-0 w-100 text-start"
+                      onClick={
+                        userConsumer.state.user ? signOutUser : signInUser
+                      }
                     >
-                      {userConsumer.state.user ? "Logout" : "Login"}
-                    </Dropdown.Item>
-                  </Button>
-                </li>
-              </ul>
-            </Dropdown.Menu>
-          </Dropdown>
+                      <Dropdown.Item
+                        className="dropdown-menu-item py-2 m-0 fs-5 rounded"
+                        as="h2"
+                      >
+                        {userConsumer.state.user ? "Logout" : "Login"}
+                      </Dropdown.Item>
+                    </Button>
+                  </li>
+                </ul>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </Nav>
 
         {/* Mobile navigation */}
-        <Navbar.Toggle
-          className="app-nav-toggle px-2 py-0 mx-2 my-1 bg-white border-transparent"
-          onClick={onMobileMenuToggle}
-          label="toggle navigation menu"
-          aria-controls={mobileNavId}
-        />
-
         <Offcanvas
           backdropClassName="bg-primary"
           id={mobileNavId}

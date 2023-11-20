@@ -58,7 +58,7 @@ class SongsService {
    * @param songIds The list of song ids to retrieve the info of
    */
   async getAllFavoriteSongs(): Promise<Song[] | null> {
-    const response = await authService.sendSSODataToAPI(
+    const response = await authService.sendAuthenticatedRequest(
       apiService.routes.get.songs.favorites,
       "GET"
     );
@@ -76,7 +76,7 @@ class SongsService {
    * @param song The song to add
    */
   async addFavoriteSong(song: Song): Promise<boolean> {
-    const response = await authService.sendSSODataToAPI(
+    const response = await authService.sendAuthenticatedRequest(
       apiService.routes.post.songs.addFavorite,
       "POST",
       {
@@ -96,7 +96,7 @@ class SongsService {
    * @param song The song to remove
    */
   async removeFavoriteSong(song: Song): Promise<boolean> {
-    const response = await authService.sendSSODataToAPI(
+    const response = await authService.sendAuthenticatedRequest(
       apiService.routes.post.songs.removeFavorite,
       "POST",
       {

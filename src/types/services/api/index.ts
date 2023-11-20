@@ -45,10 +45,3 @@ export type DataRequest = {
   apiPath: string;
   apiMethod: string;
 };
-
-export type SSODataRequest = {
-  [key: string]: string;
-  apiUrl: string;
-  apiHost: string;
-  apiMethod: APIRequestMethod;
-};

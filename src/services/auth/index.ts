@@ -1,4 +1,4 @@
-import { APIRequestMethod, SSODataRequest } from "@app-types/services/api";
+import { APIRequestMethod } from "@app-types/services/api";
 import {
   AuthInitiatorRequest,
   AuthInitiatorResponse,
@@ -118,7 +118,7 @@ class AuthService {
   }
 
   /**
-   * Sends an API request with required SSO info
+   * Sends an API request to process SSO.
    * @param url The url to send the request to
    * @param method The method of the API request
    * @param data The data to send along with the request
@@ -128,60 +128,32 @@ class AuthService {
     method: APIRequestMethod,
     data?: object
   ) {
-    const requestData = data ? data : {};
-
     return await apiService.request(url, {
       method,
-      data: { ...requestData, token: this.csrfToken || undefined },
+      data: { ...data, token: this.csrfToken },
       withCredentials: true,
     });
   }
 
   /**
-   * Sends an API request that requires SSO validation from the authentication
-   * API before being sent to this service's API.
-   * @param url The url of where the request will be sent
-   *            after passing SSO validation
-   * @param method The method of the API request that will be
-   *               sent after passing SSO validation
-   * @param data The data to tag along to the request
+   * Sends an authenticated API request.
+   * @param url The url to send the request to
+   * @param method The method of the API request
+   * @param data The data to send along with the request
    */
-  public async sendSSODataToAPI(
+  public async sendAuthenticatedRequest(
     url: string,
     method: APIRequestMethod,
     data?: object
   ) {
-    // Signs in the user if they're not signed in
-    this.signInUser();
-
-    // The host of this service's api server
-    const apiHost =
-      // @ts-ignore
-      import.meta.env.VITE_ENVIRONMENT === "production"
-        ? // @ts-ignore
-          import.meta.env.VITE_API_PROD_URL
-        : // @ts-ignore
-          import.meta.env.VITE_API_DEV_URL;
-
-    /**
-     * Required request body info for the authentication server to
-     * proxy a request to this service's API with the user's credentials
-     * validated.
-     */
-    const ssoData: SSODataRequest = {
-      apiHost,
-      apiUrl: url,
-      apiMethod: method,
-    };
-
-    return await this.sendSSORequest(
-      apiService.routes.post.ssoDataToApi,
-      "POST",
-      {
-        ...ssoData,
-        ...data,
-      }
-    );
+    return await apiService.request(url, {
+      method,
+      data,
+      withCredentials: true,
+      headers: {
+        "sso-token": this.csrfToken,
+      },
+    });
   }
 }
 

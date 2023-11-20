@@ -20,23 +20,14 @@ class AxiosInterceptorsService {
         return response;
       },
       async (error: AxiosError) => {
-        // If the request was unauthorized, the user is sent to login
+        // If the request was unauthorized, the user is sent to the auth login page
         if (
           error.response &&
           error.response.status === 401 &&
           error.response.config.url !==
             apiService.routes.post.ssoSignOutAuthRedirect
         ) {
-          // Signs out the user to remove an lingering user data before signing in
-          const userSignedOut = await this.userMethods.signOutUser();
-
-          if (userSignedOut) {
-            const userSignIn = await this.userMethods.signInUser();
-
-            if (userSignIn) {
-              return Promise.resolve();
-            }
-          }
+          await this.userMethods.signInUser();
         }
 
         return Promise.reject(error);

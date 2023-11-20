@@ -54,7 +54,7 @@ class APIService {
           removeFavorite: this.baseApiFavoritesPath.concat("/remove"),
           addOrUpdate: this.baseApiSongsPath.concat("/add-or-update"),
         },
-        sso: this.baseAuthSSOPath + "/sso",
+        ssoSignInAuthRedirect: this.baseAuthSSOPath + "/sign-in-auth-redirect",
         ssoUser: this.baseAuthSSOPath + "/sso-user",
         ssoDataToApi: this.baseAuthSSOPath + "/sso-data",
         ssoSignOutAuthRedirect:

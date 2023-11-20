@@ -15,8 +15,8 @@ export type UserConsumerMethods = {
   addFavoriteSong: (song: Song) => Promise<boolean>;
   removeFavoriteSong: (song: Song) => Promise<boolean>;
   getFavoriteSongById: (songId: string) => Song | null;
-  signInUser: () => Promise<boolean>;
-  signOutUser: () => Promise<boolean>;
+  signInUser: () => Promise<void>;
+  signOutUser: () => Promise<void>;
   reauthorizeUser: () => Promise<void>;
   getUserFullName: (user: UserData | null) => string;
 };

@@ -4,7 +4,6 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Dropdown from "react-bootstrap/Dropdown";
-import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import CloseButton from "react-bootstrap/CloseButton";
@@ -20,7 +19,6 @@ export const AppHeader = () => {
   const desktopUserMenuId = "app-navigation-desktop-user-menu";
   const [isOffcanvasVisible, setIsOffcanvasVisible] = useState(false);
   const [isUserDropdownVisible, setIsUserDropdownVisible] = useState(false);
-  const [failedToSignOut, setFailedToSignOut] = useState(false);
   const attemptedAuthRequest = useRef<boolean>(false);
   const userConsumer = useContext(userContext);
 
@@ -72,23 +70,7 @@ export const AppHeader = () => {
       event.preventDefault();
     }
 
-    const userSignedOut = await userConsumer.methods.signOutUser();
-
-    if (!userSignedOut) {
-      setFailedToSignOut(true);
-
-      // Displays the alert for a few seconds
-      setTimeout(() => {
-        setFailedToSignOut(false);
-      }, 5000);
-    }
-  };
-
-  /**
-   * Handles dismissing the "failed to sign out" alert.
-   */
-  const onAlertClose = () => {
-    setFailedToSignOut(false);
+    await userConsumer.methods.signOutUser();
   };
 
   /**
@@ -347,16 +329,6 @@ export const AppHeader = () => {
             )}
           </Offcanvas.Body>
         </Offcanvas>
-
-        <Alert
-          className="mt-3 mx-3 position-absolute top-100"
-          variant="danger"
-          show={failedToSignOut}
-          onClose={onAlertClose}
-        >
-          An error occurred while trying to log you out. Please try again or
-          contact us for assistance.
-        </Alert>
       </Container>
     </Navbar>
   );

@@ -24,7 +24,7 @@ export type APIRoute = {
       removeFavorite: string;
       addOrUpdate: string;
     };
-    sso: string;
+    ssoSignInAuthRedirect: string;
     ssoUser: string;
     ssoDataToApi: string;
     ssoSignOutAuthRedirect: string;

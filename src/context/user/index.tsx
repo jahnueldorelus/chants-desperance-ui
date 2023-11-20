@@ -105,51 +105,29 @@ const UserProvider = (props: UserProviderProps) => {
     if (!authReqProcessing && !user) {
       setAuthReqProcessing(true);
 
-      const userDataOrAuthUrl = await authService.signInUser();
+      const authUrl = await authService.signInUser();
 
-      // If the response is the SSO authentication url
-      if (typeof userDataOrAuthUrl === "string") {
-        setSSOAuthUrl(userDataOrAuthUrl);
-      }
-      // The response is the user's data
-      else {
-        setUser(userDataOrAuthUrl);
-        setAuthReqProcessing(false);
+      if (!!authUrl) {
+        setSSOAuthUrl(authUrl);
       }
 
-      return true;
-    } else if (user) {
-      return true;
-    } else {
-      return false;
+      setAuthReqProcessing(false);
     }
   };
 
   /**
-   * Attempts to sign out the user.
+   * Signs out the user.
    */
   const signOutUser = async () => {
     setAuthReqProcessing(true);
-
     const signOutAuthUrl = await authService.signOutUser();
-
     setAuthReqProcessing(false);
 
-    // If a sign out auth url given to navigate to
-    if (signOutAuthUrl && typeof signOutAuthUrl === "string") {
-      setUser(null);
+    if (typeof signOutAuthUrl === "string") {
       location.replace(signOutAuthUrl);
-    } else if (signOutAuthUrl) {
-      /**
-       * If the boolean true was returned (aka user is unauthorized which means
-       * that they are already signed out)
-       */
-      setUser(null);
-      return true;
     }
 
-    // An error occurred signing out the user
-    return false;
+    setUser(null);
   };
 
   /**

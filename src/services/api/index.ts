@@ -3,12 +3,9 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 
 class APIService {
   private baseApiPath =
-    // @ts-ignore
-    import.meta.env.VITE_ENVIRONMENT === "production"
-      ? // @ts-ignore
-        import.meta.env.VITE_API_PROD_URL
-      : // @ts-ignore
-        import.meta.env.VITE_API_DEV_URL;
+    import.meta.env["VITE_ENVIRONMENT"] === "production"
+      ? import.meta.env["VITE_API_PROD_URL"]
+      : import.meta.env["VITE_API_DEV_URL"];
 
   private baseApiBooksPath = this.baseApiPath + "/api/categories";
   private baseApiSongsPath = this.baseApiPath + "/api/songs";
@@ -16,12 +13,9 @@ class APIService {
   private baseApiFavoritesPath = this.baseApiSongsPath + "/favorites";
 
   private baseAuthApiPath =
-    // @ts-ignore
-    import.meta.env.VITE_ENVIRONMENT === "production"
-      ? // @ts-ignore
-        import.meta.env.VITE_AUTH_API_PROD_URL
-      : // @ts-ignore
-        import.meta.env.VITE_AUTH_API_DEV_URL;
+    import.meta.env["VITE_ENVIRONMENT"] === "production"
+      ? import.meta.env["VITE_AUTH_API_PROD_URL"]
+      : import.meta.env["VITE_AUTH_API_DEV_URL"];
 
   private baseAuthSSOPath = this.baseAuthApiPath + "/api/sso";
 

@@ -130,7 +130,7 @@ class AuthService {
   ) {
     return await apiService.request(url, {
       method,
-      data: { ...data, token: this.csrfToken },
+      data: { ...data, token: this.csrfToken || undefined },
       withCredentials: true,
     });
   }

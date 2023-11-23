@@ -23,7 +23,7 @@ export const initialUserContextState: UserConsumer = {
 
     signInUser: async () => {},
 
-    signOutUser: async () => false,
+    signOutUser: async () => {},
 
     reauthorizeUser: async () => {},
 

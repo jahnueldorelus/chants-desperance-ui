@@ -21,7 +21,7 @@ export const initialUserContextState: UserConsumer = {
 
     getFavoriteSongById: (arg0) => null,
 
-    signInUser: async () => false,
+    signInUser: async () => {},
 
     signOutUser: async () => false,
 

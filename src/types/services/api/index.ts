@@ -24,7 +24,7 @@ export type APIRoute = {
       removeFavorite: string;
       addOrUpdate: string;
     };
-    sso: string;
+    ssoSignInAuthRedirect: string;
     ssoUser: string;
     ssoDataToApi: string;
     ssoSignOutAuthRedirect: string;
@@ -44,11 +44,4 @@ export type DataRequest = {
   serviceId: string;
   apiPath: string;
   apiMethod: string;
-};
-
-export type SSODataRequest = {
-  [key: string]: string;
-  apiUrl: string;
-  apiHost: string;
-  apiMethod: APIRequestMethod;
 };
